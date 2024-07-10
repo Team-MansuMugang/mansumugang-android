@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+<!--tools:context=".LoginActivity"-->
+
+
+<TextView
+    android:id="@+id/login_app_name"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="15dp"
+    android:text="만수무강"
+    android:textSize="30sp"
+    android:textStyle="bold"
+    app:layout_constraintBottom_toTopOf="@+id/login_app_explanation"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent" />
+
+<TextView
+    android:id="@+id/login_app_explanation"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="40dp"
+    android:text="만수무강을 위한 노인 케어 서비스"
+    android:textSize="16sp"
+    android:textColor="#A9A9A9"
+    android:textStyle="bold"
+    app:layout_constraintBottom_toTopOf="@+id/login_id"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent" />
+
+<EditText
+    android:id="@+id/login_id"
+    android:layout_width="wrap_content"
+    android:layout_height="48dp"
+    android:layout_marginBottom="20dp"
+    android:ems="14"
+    android:hint="아이디"
+    android:padding="10dp"
+
+    android:background="@drawable/edit_round"
+    android:inputType="textEmailAddress"
+    app:layout_constraintBottom_toTopOf="@+id/login_password"
+    app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+<EditText
+    android:id="@+id/login_password"
+    android:layout_width="wrap_content"
+    android:layout_height="48dp"
+    android:layout_marginBottom="14dp"
+    android:background="@drawable/edit_round"
+    android:ems="14"
+    android:hint="비밀번호"
+    android:padding="10dp"
+    android:inputType="textPassword"
+    app:layout_constraintBottom_toTopOf="@+id/login_button"
+    app:layout_constraintStart_toStartOf="@+id/login_id" />
+
+<Button
+    android:id="@+id/login_button"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="14dp"
+    android:text="로그인"
+    android:backgroundTint="#7C93E5"
+    android:padding="10dp"
+    app:layout_constraintStart_toStartOf="@+id/login_password"
+    app:layout_constraintEnd_toEndOf="@+id/login_password"
+    app:layout_constraintBottom_toTopOf="@+id/keep_login_checkbox"
+    />
+
+
+<!--<Button-->
+<!--    android:id="@+id/login_button"-->
+<!--    android:layout_width="wrap_content"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:text="로그인"-->
+<!--    app:layout_constraintBaseline_toBaselineOf="@+id/join_button"-->
+<!--    app:layout_constraintStart_toStartOf="@+id/login_password" />-->
+<CheckBox
+    android:id="@+id/keep_login_checkbox"
+    android:background="@drawable/edit_round"
+    android:layout_marginBottom="20dp"
+    android:checked="true"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    app:layout_constraintBottom_toTopOf="@id/id_box"
+    android:text="자동 로그인"
+    app:layout_constraintStart_toStartOf="@id/login_password"
+    app:layout_constraintEnd_toEndOf="@+id/login_password"
+    >
+
+</CheckBox>
+<LinearLayout
+    android:id="@+id/id_box"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="@+id/login_password"
+    app:layout_constraintEnd_toEndOf="@+id/login_password"
+    android:layout_marginBottom="190dp"
+    android:orientation="horizontal"
+android:gravity="center_horizontal"
+
+    >
+    <TextView
+    android:id="@+id/join_button"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginRight="40dp"
+    android:hint="회원가입"
+        />
+
+<TextView
+    android:id="@+id/find_id"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginRight="40dp"
+
+    android:hint="아이디 찾기"
+    />
+
+<TextView
+    android:id="@+id/find_pw"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+
+    android:hint="비밀번호 찾기"
+    />
+</LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
