@@ -25,7 +25,8 @@
         android:text="녹음">
     </TextView>
 
-    <TextView
+
+    <Chronometer
         android:id="@+id/recording_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,9 +35,9 @@
         android:layout_marginBottom="30dp"
         android:textStyle="bold"
         android:textSize="25dp"
-        android:text="00:00"
+        android:layerType="hardware"
         >
-    </TextView>
+    </Chronometer>
     <ImageButton
         android:id="@+id/recording_button"
         android:src="@drawable/recording"
