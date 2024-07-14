@@ -21,4 +21,8 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("api/auth/login")
     Call<LoginResponse> login(@Body RequestBody requestBody);
+
+    @Headers("Content-Type: application/json")
+    @POST("api/auth/refresh")
+    Call<TokenResponse> refreshToken(@Body TokenRequest tokenRequest);
 }

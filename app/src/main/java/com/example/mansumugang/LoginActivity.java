@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,7 +37,6 @@ public class LoginActivity extends AppCompatActivity {
         // 뷰 요소들을 초기화합니다.
         loginIdEditText = findViewById(R.id.login_id);
         loginPasswordEditText = findViewById(R.id.login_password);
-        CheckBox keepLoginCheckBox = findViewById(R.id.keep_login_checkbox);
         loginButton = findViewById(R.id.login_button);
 
         // 로그인 버튼 클릭 리스너 설정

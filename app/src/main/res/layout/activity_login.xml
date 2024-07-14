@@ -23,7 +23,7 @@ android:layout_height="match_parent">
     android:id="@+id/login_app_explanation"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="40dp"
+    android:layout_marginBottom="90dp"
     android:text="만수무강을 위한 노인 케어 서비스"
     android:textSize="16sp"
     android:textColor="#A9A9A9"
@@ -70,31 +70,11 @@ android:layout_height="match_parent">
     android:padding="10dp"
     app:layout_constraintStart_toStartOf="@+id/login_password"
     app:layout_constraintEnd_toEndOf="@+id/login_password"
-    app:layout_constraintBottom_toTopOf="@+id/keep_login_checkbox"
+    app:layout_constraintBottom_toTopOf="@+id/id_box"
     />
 
 
-<!--<Button-->
-<!--    android:id="@+id/login_button"-->
-<!--    android:layout_width="wrap_content"-->
-<!--    android:layout_height="wrap_content"-->
-<!--    android:text="로그인"-->
-<!--    app:layout_constraintBaseline_toBaselineOf="@+id/join_button"-->
-<!--    app:layout_constraintStart_toStartOf="@+id/login_password" />-->
-<CheckBox
-    android:id="@+id/keep_login_checkbox"
-    android:background="@drawable/edit_round"
-    android:layout_marginBottom="20dp"
-    android:checked="true"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    app:layout_constraintBottom_toTopOf="@id/id_box"
-    android:text="자동 로그인"
-    app:layout_constraintStart_toStartOf="@id/login_password"
-    app:layout_constraintEnd_toEndOf="@+id/login_password"
-    >
 
-</CheckBox>
 <LinearLayout
     android:id="@+id/id_box"
     android:layout_width="0dp"

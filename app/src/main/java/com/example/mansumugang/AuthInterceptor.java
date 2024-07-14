@@ -22,7 +22,7 @@ public class AuthInterceptor implements Interceptor {
 
         // 기존 요청에 Authorization 헤더를 추가하여 새 요청을 만듭니다.
         Request request = chain.request().newBuilder()
-                .addHeader("Authorization", token)
+                .addHeader("Authorization", "Bearer " + token)
                 .build();
 
         // 새 요청을 진행하여 응답을 반환합니다.

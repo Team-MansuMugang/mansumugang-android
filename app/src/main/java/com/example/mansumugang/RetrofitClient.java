@@ -22,7 +22,10 @@ public class RetrofitClient {
      */
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
-            OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .authenticator(new TokenAuthenticator(App.getContext()))  // TokenAuthenticator 추가
+                    .addInterceptor(new AuthInterceptor())  // AuthInterceptor 추가
+                    .build();
 
             retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
