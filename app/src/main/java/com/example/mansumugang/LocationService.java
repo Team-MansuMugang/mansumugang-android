@@ -1,44 +1,20 @@
 package com.example.mansumugang;
 
-import android.Manifest;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.IBinder;
-import android.os.Looper;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-
 /**
- * LocationService 클래스는 위치 서비스를 백그라운드에서 실행합니다.
+ * LocationService 클래스는 위치 서비스를 관리합니다.
  */
 public class LocationService extends Service {
 
-    // 위치 업데이트 콜백
-    private LocationCallback mLocationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            super.onLocationResult(locationResult);
-            if (locationResult != null && locationResult.getLastLocation() != null) {
-                double latitude = locationResult.getLastLocation().getLatitude();
-                double longitude = locationResult.getLastLocation().getLongitude();
-                Log.v("LOCATION_UPDATE", latitude + ", " + longitude);
-            }
-        }
-    };
+    private LocationHelper locationHelper;
+    private LocationNotificationHelper notificationHelper;
 
     @Nullable
     @Override
@@ -46,72 +22,54 @@ public class LocationService extends Service {
         return null;
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        locationHelper = new LocationHelper(this);
+        // Android O 이상에서 NotificationHelper 초기화
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationHelper = new LocationNotificationHelper(this);
+        }
+    }
+
     /**
      * 위치 서비스를 시작합니다.
+     * 포그라운드 서비스로 시작하여 사용자에게 알림을 표시합니다.
      */
     private void startLocationService() {
-        String channelId = "location_notification_channel";
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // 알림을 클릭했을 때 실행되는 인텐트 생성
-        Intent resultIntent = new Intent();
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                getApplicationContext(),
-                0,
-                resultIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
-
-        // 알림 생성
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), channelId)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Location Service")
-                .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setContentText("Running")
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(false)
-                .setPriority(NotificationCompat.PRIORITY_MAX);
-
-        // Android O 이상에서는 알림 채널을 설정해야 합니다.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (notificationManager != null && notificationManager.getNotificationChannel(channelId) == null) {
-                NotificationChannel notificationChannel = new NotificationChannel(
-                        channelId,
-                        "Location Service",
-                        NotificationManager.IMPORTANCE_HIGH
-                );
-                notificationChannel.setDescription("This channel is used by location service");
-                notificationManager.createNotificationChannel(notificationChannel);
-            }
+            // 알림 채널을 통해 포그라운드 서비스 시작
+            NotificationCompat.Builder builder = notificationHelper.getNotificationBuilder();
+            startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
         }
-
-        // 위치 요청 설정
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(4000);
-        locationRequest.setFastestInterval(2000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        // 위치 권한이 없으면 종료
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        // 위치 업데이트 요청
-        LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, mLocationCallback, Looper.getMainLooper());
-
-        // 포그라운드 서비스 시작
-        startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
+        // 위치 업데이트 시작
+        locationHelper.startLocationUpdates();
     }
 
     /**
      * 위치 서비스를 중지합니다.
+     * 위치 업데이트를 중단하고, 포그라운드 서비스에서 제거합니다.
      */
     private void stopLocationService() {
-        LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(mLocationCallback);
-        stopForeground(true);
+        // 위치 업데이트 중단
+        locationHelper.stopLocationUpdates();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // 포그라운드 서비스 중단
+            stopForeground(true);
+        }
+        // 서비스 중지
         stopSelf();
     }
 
+    /**
+     * 서비스가 시작될 때 호출됩니다.
+     * 인텐트에 따라 위치 서비스를 시작하거나 중지합니다.
+     *
+     * @param intent  서비스 시작 인텐트
+     * @param flags   추가 데이터
+     * @param startId 서비스 시작 ID
+     * @return 서비스 시작 상태
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {

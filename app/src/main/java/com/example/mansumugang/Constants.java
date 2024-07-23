@@ -12,4 +12,7 @@ public class Constants {
 
     // 위치 서비스 중지 액션
     static final String ACTION_STOP_LOCATION_SERVICE = "stopLocationService";
+
+    // 위치 알림 채널 ID
+    public static final String CHANNEL_ID = "location_notification_channel";
 }
