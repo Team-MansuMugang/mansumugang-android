@@ -25,22 +25,25 @@ public interface ApiService {
 
     /**
      * 서버로 토큰 갱신 요청을 보냅니다.
-     *
-     * @param tokenRequest 토큰 갱신 요청 본문
-     * @return 서버로부터의 응답을 포함하는 Call 객체
+     * @param accessToken     현재 액세스 토큰
+     * @param refreshToken    리프레시 토큰
+     * @return TokenResponse 객체를 포함하는 Call
      */
     @Headers("Content-Type: application/json")
     @POST("api/auth/refresh")
-    Call<TokenResponse> refreshToken(@Body TokenRequest tokenRequest);
+
+    Call<TokenResponse> refreshToken(
+            @Header("Authorization") String accessToken,
+            @Header("Authorization-refresh") String refreshToken);
 
     /**
      * 서버로 위치 정보를 저장 요청을 보냅니다.
      *
-     * @param token 인증 토큰
+     * @param accessToken 인증 토큰
      * @param locationRequest 위치 정보 요청 본문
      * @return 서버로부터의 응답을 포함하는 Call 객체
      */
     @Headers("Content-Type: application/json")
-    @POST("location/save")
-    Call<Void> saveLocation(@Header("Authorization") String token, @Body LocationRequest locationRequest);
+    @POST("api/location/save")
+    Call<Void> saveLocation(@Header("Authorization") String accessToken, @Body CustomLocationRequest locationRequest);
 }

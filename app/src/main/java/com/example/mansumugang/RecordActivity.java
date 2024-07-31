@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -36,7 +38,10 @@ public class RecordActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording);
-        // getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        // BottomNavigationView 설정
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);
 
         initializeRecordingButtons();
     }

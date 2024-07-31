@@ -81,7 +81,7 @@ public class WeekCalendarAdapter extends RecyclerView.Adapter<WeekCalendarAdapte
     public void onBindViewHolder(@NonNull WeekCalendarAdapter.ViewHolder holder, int position) {
         holder.dayTextView.setText(dayFormat.format(weekDates[position]));
         holder.dateTextView.setText(dateFormat.format(weekDates[position]));
-        holder.itemView.setBackgroundColor(selectedPosition == position ? Color.LTGRAY : Color.TRANSPARENT);
+        holder.itemView.setBackgroundColor(selectedPosition == position ? Color.parseColor("#8582FF") : Color.TRANSPARENT);
 
         // 레이아웃 크기 설정
         ViewGroup.LayoutParams layoutParams = holder.itemView.getLayoutParams();

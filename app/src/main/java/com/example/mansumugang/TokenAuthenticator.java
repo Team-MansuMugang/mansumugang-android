@@ -40,27 +40,46 @@ public class TokenAuthenticator implements Authenticator {
      */
     @Override
     public Request authenticate(Route route, Response response) throws IOException {
+        Log.d(TAG, "authenticate() called");
         String accessToken = App.prefs.getToken();       // 현재 액세스 토큰
         String refreshToken = App.prefs.getRefreshToken(); // 리프레시 토큰
 
-        if (response.code() == 401 || response.code() == 403) { // 인증 실패 코드 확인
+        // 인증 실패 코드 확인
+        if (response.code() == 401 || response.code() == 403) {
+            // 이미 토큰 갱신 시도를 했는지 확인하여 무한 루프 방지
+//            if (response.request().header("Authorization") != null &&
+//                    response.request().header("Authorization").startsWith("Bearer " + accessToken)) {
+//                return null; // 무한 루프 방지를 위해 null 반환
+//            }
+
             ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
 
             try {
                 // 토큰 갱신 요청
-                Call<TokenResponse> call = apiService.refreshToken(new TokenRequest(accessToken, refreshToken));
+                Log.d(TAG,"try block in");
+                Call<TokenResponse> call = apiService.refreshToken(
+                        "Bearer " + accessToken,
+                        "Bearer " + refreshToken
+                );
                 retrofit2.Response<TokenResponse> tokenResponse = call.execute();
+                Log.d(TAG,"newtoken result" + tokenResponse);
 
                 if (tokenResponse.isSuccessful()) {
                     TokenResponse newToken = tokenResponse.body();
+
                     if (newToken != null) {
                         // 새로운 액세스 토큰 저장
                         App.prefs.setToken(newToken.getAccessToken());
+                        App.prefs.setRefreshToken(newToken.getRefreshToken()); // 리프레시 토큰도 저장
+                        Log.d(TAG, "New access token: " + newToken.getAccessToken());
+                        Log.d(TAG, "New refresh token: " + newToken.getRefreshToken());
 
                         // 새로운 액세스 토큰을 사용하여 원래 요청 재시도
                         return response.request().newBuilder()
                                 .header("Authorization", "Bearer " + newToken.getAccessToken())
                                 .build();
+                    } else {
+                        Log.e(TAG, "TokenResponse is null");
                     }
                 } else {
                     Log.e(TAG, "토큰 갱신 실패: " + tokenResponse.message());

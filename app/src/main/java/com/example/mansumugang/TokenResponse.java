@@ -1,24 +1,35 @@
 package com.example.mansumugang;
 
-/**
- * TokenResponse 클래스는 토큰 갱신 응답을 나타냅니다.
- */
 public class TokenResponse {
     private String accessToken;
+    private String refreshToken;
 
-    /**
-     * 액세스 토큰을 반환합니다.
-     * @return 새로운 액세스 토큰
-     */
+    // 기본 생성자
+    public TokenResponse() {}
+
+    // 모든 필드를 포함하는 생성자
+    public TokenResponse(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
+
+    // accessToken에 대한 getter
     public String getAccessToken() {
         return accessToken;
     }
 
-    /**
-     * 액세스 토큰을 설정합니다.
-     * @param accessToken 새로운 액세스 토큰
-     */
+    // accessToken에 대한 setter
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    // refreshToken에 대한 getter
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    // refreshToken에 대한 setter
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

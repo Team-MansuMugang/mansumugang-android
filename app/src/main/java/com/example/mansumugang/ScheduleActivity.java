@@ -14,6 +14,8 @@ import android.view.ViewTreeObserver;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 /**
  * ScheduleActivity 클래스는 애플리케이션의 일정 화면을 담당합니다.
  */
@@ -35,6 +37,10 @@ public class ScheduleActivity extends AppCompatActivity {
         // 어댑터 설정
         weekCalendarAdapter = new WeekCalendarAdapter();
         weekRecyclerView.setAdapter(weekCalendarAdapter);
+
+        // BottomNavigationView 설정
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);
 
         // 토큰 확인
         String token = App.prefs.getToken();

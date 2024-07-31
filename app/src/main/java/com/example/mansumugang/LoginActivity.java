@@ -1,5 +1,6 @@
 package com.example.mansumugang;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -90,6 +91,11 @@ public class LoginActivity extends AppCompatActivity {
 
                         String savedToken = App.prefs.getToken();
                         System.out.println("저장된 액세스 토큰: " + savedToken);
+
+                        // 스케줄 액티비티로 이동
+                        Intent intent = new Intent(LoginActivity.this, ScheduleActivity.class);
+                        startActivity(intent);
+                        finish(); // 현재 액티비티를 종료하여 백 스택에서 제거
                     } else {
                         String errorMessage = "로그인 실패: 응답 없음";
                         Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();

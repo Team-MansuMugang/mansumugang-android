@@ -75,7 +75,7 @@
             android:id="@+id/recording_save_button"
             android:layout_width="90dp"
             android:backgroundTint="#7C93E5"
-            android:text="저장"
+            android:text="잔성"
             android:textSize="20dp"
             android:layout_marginRight="30dp"
             android:layout_height="70dp">
@@ -94,13 +94,13 @@
     </LinearLayout>
     </LinearLayout>
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/viewBottomNav"
+        android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/activity_protege_bottom_nav" />
+        app:menu="@menu/bottom_nav_menu" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
