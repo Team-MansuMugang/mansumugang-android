@@ -90,8 +90,10 @@ public class LoginActivity extends AppCompatActivity {
                         App.prefs.setUserType(userType); // 사용자 유형 저장
 
                         String savedToken = App.prefs.getToken();
-                        System.out.println("저장된 액세스 토큰: " + savedToken);
+                        String RefreshToken = App.prefs.getRefreshToken();
 
+                        System.out.println("저장된 액세스 토큰: " + savedToken);
+                        System.out.println("저장된 ref 토큰: " + RefreshToken);
                         // 스케줄 액티비티로 이동
                         Intent intent = new Intent(LoginActivity.this, ScheduleActivity.class);
                         startActivity(intent);

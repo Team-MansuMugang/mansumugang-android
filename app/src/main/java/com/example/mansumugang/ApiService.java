@@ -30,9 +30,9 @@ public interface ApiService {
      * @return TokenResponse 객체를 포함하는 Call
      */
     @Headers("Content-Type: application/json")
-    @POST("api/auth/refresh")
+    @POST("api/auth/refreshToken")
 
-    Call<TokenResponse> refreshToken(
+    Call<RefreshTokenResponse> refreshToken(
             @Header("Authorization") String accessToken,
             @Header("Authorization-refresh") String refreshToken);
 

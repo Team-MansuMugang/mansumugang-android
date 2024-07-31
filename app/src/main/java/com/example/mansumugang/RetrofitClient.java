@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RetrofitClient {
     // 서버의 기본 URL
-    private static final String BASE_URL = "https://f1d7-218-239-207-52.ngrok-free.app";
+    private static final String BASE_URL = "http://minnnisu.iptime.org";
     // Retrofit 인스턴스를 저장하기 위한 변수
     private static Retrofit retrofit;
 
