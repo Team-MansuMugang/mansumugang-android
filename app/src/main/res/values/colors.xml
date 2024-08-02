@@ -1,2 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <color name="colorPrimary">#007846</color>
+    <color name="SecondaryColorLight">#E6F6F0</color>
+    <color name="SecondaryColorDark">#58B991</color>
+    <color name="Success">#4BC361</color>
+    <color name="Warning">#F4B741</color>
+    <color name="ImportantError">#FF5252</color>
+    <color name="Info">#52A2FF</color>
+    <color name="Black">#000000</color>
+    <color name="Gray15">#303030</color>
+    <color name="Gray30">#474C4A</color>
+    <color name="Gray45">#636C69</color>
+    <color name="Gray60">#94A19C</color>
+    <color name="Gray75">#A6B4AF</color>
+    <color name="Gray90">#D2DDD9</color>
+    <color name="Gray95">#F8F8F8</color>
+    <color name="White">#FFFFFF</color>
+
+</resources>

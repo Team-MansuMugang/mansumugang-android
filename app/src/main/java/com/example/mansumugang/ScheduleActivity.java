@@ -40,6 +40,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
         // BottomNavigationView 설정
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.schedule);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);
 
         // 토큰 확인
@@ -48,6 +49,7 @@ public class ScheduleActivity extends AppCompatActivity {
             // 토큰이 없으면 로그인 액티비티로 이동
             Intent loginIntent = new Intent(ScheduleActivity.this, LoginActivity.class);
             startActivity(loginIntent);
+            overridePendingTransition(0, 0);
             finish(); // 현재 액티비티를 종료하여 백 스택에서 제거
         } else {
             // 토큰이 있으면 위치 서비스 시작

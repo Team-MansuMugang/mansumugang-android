@@ -30,6 +30,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="@color/White"
+        app:itemIconTint="@color/selector_bottom_nav_item"
+        app:itemTextColor="@color/selector_bottom_nav_item"
+        app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
 
 </RelativeLayout>

@@ -46,4 +46,17 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("api/location/save")
     Call<Void> saveLocation(@Header("Authorization") String accessToken, @Body CustomLocationRequest locationRequest);
+
+
+    /**
+     * 서버로 로그아웃 요청을 보냅니다.
+     * @param refreshToken    리프레시 토큰
+     * @return LogoutResponse 객체를 포함하는 Call
+     */
+    @Headers("Content-Type: application/json")
+    @POST("api/auth/logout")
+    Call<LogoutResponse> logout(
+            @Header("Authorization-refresh") String refreshToken);
+
+
 }

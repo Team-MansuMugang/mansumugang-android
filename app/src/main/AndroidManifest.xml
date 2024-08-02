@@ -30,6 +30,7 @@
         >
         <activity
             android:name=".ScheduleActivity"
+            android:theme="@style/NoAnimationTheme"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,8 +38,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".RecordActivity"/>
-        <activity android:name=".LoginActivity"/>
+        <activity android:name=".RecordActivity"
+            android:theme="@style/NoAnimationTheme"/>
+        <activity android:name=".LoginActivity"
+            android:theme="@style/NoAnimationTheme"/>
+        <activity android:name=".GuidelineActivity"
+            android:theme="@style/NoAnimationTheme"/>
+        <activity android:name=".SettingsActivity"
+            android:theme="@style/NoAnimationTheme"/>
+
 
         <service
             android:name=".LocationService"

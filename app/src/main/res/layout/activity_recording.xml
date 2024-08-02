@@ -54,8 +54,7 @@
     <Button
         android:id="@+id/recording_start_button"
         android:layout_width="90dp"
-
-        android:backgroundTint="#7C93E5"
+        android:backgroundTint="@color/SecondaryColorDark"
         android:text="시작"
         android:textSize="20dp"
         android:layout_height="70dp"
@@ -74,15 +73,15 @@
         <Button
             android:id="@+id/recording_save_button"
             android:layout_width="90dp"
-            android:backgroundTint="#7C93E5"
-            android:text="잔성"
+            android:backgroundTint="@color/SecondaryColorDark"
+            android:text="전송"
             android:textSize="20dp"
             android:layout_marginRight="30dp"
             android:layout_height="70dp">
         </Button>
         <Button
             android:id="@+id/recording_cancel_button"
-            android:backgroundTint="#B6B6B6"
+            android:backgroundTint="@color/Gray75"
             android:text="취소"
             android:textSize="20dp"
             android:layout_width="90dp"
@@ -97,10 +96,13 @@
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/White"
+        app:itemIconTint="@color/selector_bottom_nav_item"
+        app:itemTextColor="@color/selector_bottom_nav_item"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:menu="@menu/bottom_nav_menu" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

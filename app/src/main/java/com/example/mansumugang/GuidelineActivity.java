@@ -15,6 +15,8 @@ public class GuidelineActivity extends AppCompatActivity {
         setContentView(R.layout.activity_guideline);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.guideline);
+
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);
     }
 }

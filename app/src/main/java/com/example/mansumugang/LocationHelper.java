@@ -39,8 +39,8 @@ public class LocationHelper {
 
     public void startLocationUpdates() {
         LocationRequest locationRequest = LocationRequest.create()
-                .setInterval(3000) // 30초 간격으로 위치 업데이트 요청
-                .setFastestInterval(1000) // 최소 10초 간격으로 위치 업데이트 요청
+                .setInterval(30000) // 30초 간격으로 위치 업데이트 요청
+                .setFastestInterval(10000) // 최소 10초 간격으로 위치 업데이트 요청
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&

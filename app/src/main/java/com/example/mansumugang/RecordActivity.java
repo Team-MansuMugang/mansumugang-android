@@ -41,7 +41,9 @@ public class RecordActivity extends AppCompatActivity {
 
         // BottomNavigationView 설정
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.recording);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);
+
 
         initializeRecordingButtons();
     }

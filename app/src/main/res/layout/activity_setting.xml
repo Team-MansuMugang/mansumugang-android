@@ -34,15 +34,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="가족관계"
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"/>
     </LinearLayout>
+<!--    scrollview 수정-->
 
+    <TextView
+        android:id="@+id/logout_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        android:gravity="center_horizontal"
+        android:text="로그아웃"
+        android:textSize="20dp"
+        android:paddingBottom="10dp"
+        android:textStyle="bold"
+        android:textColor="@color/ImportantError"
+        android:layout_marginBottom="120dp"
+
+        />
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/White"
+        app:itemIconTint="@color/selector_bottom_nav_item"
+        app:itemTextColor="@color/selector_bottom_nav_item"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -97,6 +97,7 @@ public class LoginActivity extends AppCompatActivity {
                         // 스케줄 액티비티로 이동
                         Intent intent = new Intent(LoginActivity.this, ScheduleActivity.class);
                         startActivity(intent);
+                        overridePendingTransition(0, 0);
                         finish(); // 현재 액티비티를 종료하여 백 스택에서 제거
                     } else {
                         String errorMessage = "로그인 실패: 응답 없음";
