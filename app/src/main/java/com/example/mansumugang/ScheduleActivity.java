@@ -159,7 +159,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
 
     }
 
-    private void displaySchedule(List<ScheduleResponse.Schedule> schedules , String getImageApiUrlPrefix) {
+    private void displaySchedule(List<ScheduleResponse.Schedule> schedules, String imageApiUrlPrefix) {
         layoutBox.removeAllViews();
         if (schedules == null || schedules.isEmpty()) {
             TextView emptyView = new TextView(this);
@@ -175,59 +175,9 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
         }
 
         for (ScheduleResponse.Schedule schedule : schedules) {
-            View scheduleView = getLayoutInflater().inflate(R.layout.schedule_item, layoutBox, false);
-            TextView timeView = scheduleView.findViewById(R.id.timeText);
-            timeView.setText(" " + schedule.getTime());
-            System.out.println(" qwer"  + schedule.getTime());
-            // medicineView를 additionalBox에 추가
-            LinearLayout additionalBox = scheduleView.findViewById(R.id.additionalBox);
-
-            for (ScheduleResponse.Schedule.Medicine medicine : schedule.getMedicines()) {
-
-                View medicineView = getLayoutInflater().inflate(R.layout.medicine_item, layoutBox, false);
-
-                TextView medicineNameView = medicineView.findViewById(R.id.medicineName);
-                TextView hospitalNameView = medicineView.findViewById(R.id.hospitalName);
-                TextView descriptionView = medicineView.findViewById(R.id.description);
-                ImageView medicineImage = medicineView.findViewById(R.id.medicineImage);
-                Button takingButton = medicineView.findViewById(R.id.takingButton);
-
-
-
-                medicineNameView.setText(medicine.getMedicineName());
-
-                hospitalNameView.setText(medicine.getHospitalName());
-                descriptionView.setText(medicine.getMedicineDescription());
-
-                String imageUrl = getImageApiUrlPrefix + medicine.getMedicineImageName();
-                // getMedicineImageName이 null 이면 기본대체 이미지로
-                System.out.println("this gay: " + imageUrl);
-                Glide.with(this).load(imageUrl).into(medicineImage);
-
-                takingButton.setText("먹었어요");
-
-                System.out.println("asdasd" + medicine.isStatus());
-                if(medicine.isStatus().equals("WAITING") || medicine.isStatus().equals("NOT_TIME"))
-                {
-                    takingButton.setBackgroundColor(getResources().getColor(R.color.SecondaryColorDark));
-
-                } else {
-                    takingButton.setBackgroundColor(getResources().getColor(R.color.Gray45));
-                    takingButton.setTextColor(getResources().getColor(R.color.White));
-                    takingButton.setEnabled(false);
-
-                }
-
-
-
-
-                // medicineView를 additionalBox에 추가
-
-                additionalBox.addView(medicineView);
-
-            }
+            View scheduleView = ScheduleItem.createScheduleView(this, layoutBox, schedule, imageApiUrlPrefix);
             layoutBox.addView(scheduleView);
-
         }
     }
+
 }
