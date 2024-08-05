@@ -24,6 +24,9 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,7 +35,7 @@ import retrofit2.Response;
 /**
  * ScheduleActivity 클래스는 애플리케이션의 일정 화면을 담당합니다.
  */
-public class ScheduleActivity extends AppCompatActivity {
+public class ScheduleActivity extends AppCompatActivity implements OnDateSelectedListener {
     private RecyclerView weekRecyclerView;
     private static final String TAG = "ScheduleActivity";
     private WeekCalendarAdapter weekCalendarAdapter;
@@ -49,7 +52,7 @@ public class ScheduleActivity extends AppCompatActivity {
         weekRecyclerView.setLayoutManager(layoutManager);
 
         // 어댑터 설정
-        weekCalendarAdapter = new WeekCalendarAdapter();
+        weekCalendarAdapter = new WeekCalendarAdapter(this);
         weekRecyclerView.setAdapter(weekCalendarAdapter);
 
         // BottomNavigationView 설정
@@ -75,13 +78,26 @@ public class ScheduleActivity extends AppCompatActivity {
                 stopLocationService();
             }
             startLocationService();
+            // 오늘 날짜를 가져오기
+            Date today = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            String formattedDate = dateFormat.format(today);
+
             // 데이터 가져오기
-            fetchScheduleData("2024-08-08");
+            fetchScheduleData(formattedDate);
         }
 
 
     }
 
+
+    @Override
+    public void onDateSelected(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String formattedDate = sdf.format(date);
+        Log.d(TAG, "Selected date: " + formattedDate);
+        fetchScheduleData(formattedDate);
+    }
 
     /**
      * 위치 서비스가 실행 중인지 확인합니다.
@@ -190,6 +206,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
                 takingButton.setText("먹었어요");
                 takingButton.setBackgroundColor(getResources().getColor(R.color.SecondaryColorDark));
+//                takingButton.setBackground(getResources().getDrawable(R.drawable.edit_border_bottom));
 
 
 
