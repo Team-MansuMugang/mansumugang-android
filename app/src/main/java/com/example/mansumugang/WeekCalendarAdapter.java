@@ -97,6 +97,8 @@ public class WeekCalendarAdapter extends RecyclerView.Adapter<WeekCalendarAdapte
                 notifyItemChanged(previousPosition);
             }
             notifyItemChanged(selectedPosition);
+
+
         });
     }
 

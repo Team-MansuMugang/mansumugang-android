@@ -3,9 +3,11 @@ package com.example.mansumugang;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Header;
+import retrofit2.http.Query;
 
 /**
  * ApiService 인터페이스는 API 엔드포인트와 요청 메서드를 정의합니다.
@@ -57,6 +59,21 @@ public interface ApiService {
     @POST("api/auth/logout")
     Call<LogoutResponse> logout(
             @Header("Authorization-refresh") String refreshToken);
+
+
+    /**
+     * 서버로 일정 요청을 보냅니다.
+     *
+     * @param accessToken 인증 토큰
+     * @param date 조회 일자
+     * @return 서버로부터의 응답을 포함하는 Call 객체
+     */
+    @GET("api/medicine/patient")
+    Call<ScheduleResponse> getSchedule(
+            @Header("Authorization") String accessToken,
+            @Query("date") String date);
+
+
 
 
 }

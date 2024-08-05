@@ -105,9 +105,10 @@ public class TokenAuthenticator implements Authenticator {
                             ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
                             boolean isServiceRunning = false;
 
+//                            수정필요 ++ 리프래쉬 토큰 상실일 경우 모든 토큰을 제거하지만 로케이션이 주기적으로 업데이트 됌, 즉 의도치 않은 로그아웃 시 실행중인 locationservice 중단 불가
                             if (activityManager != null) {
-                                for (ActivityManager.RunningServiceInfo serviceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-                                    if (LocationService.class.getName().equals(serviceInfo.service.getClassName())) {
+                                for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+                                    if (LocationService.class.getName().equals(service.service.getClassName())) {
                                         isServiceRunning = true;
                                         break;
                                     }
