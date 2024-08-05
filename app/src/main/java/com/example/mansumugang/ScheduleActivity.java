@@ -205,14 +205,24 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
                 Glide.with(this).load(imageUrl).into(medicineImage);
 
                 takingButton.setText("먹었어요");
-                takingButton.setBackgroundColor(getResources().getColor(R.color.SecondaryColorDark));
-//                takingButton.setBackground(getResources().getDrawable(R.drawable.edit_border_bottom));
+
+                System.out.println("asdasd" + medicine.isStatus());
+                if(medicine.isStatus().equals("WAITING") || medicine.isStatus().equals("NOT_TIME"))
+                {
+                    takingButton.setBackgroundColor(getResources().getColor(R.color.SecondaryColorDark));
+
+                } else {
+                    takingButton.setBackgroundColor(getResources().getColor(R.color.Gray45));
+                    takingButton.setTextColor(getResources().getColor(R.color.White));
+                    takingButton.setEnabled(false);
+
+                }
+
 
 
 
                 // medicineView를 additionalBox에 추가
-//                LinearLayout additionalBox = new LinearLayout(this);
-//                additionalBox.setOrientation(LinearLayout.VERTICAL);
+
                 additionalBox.addView(medicineView);
 
             }
