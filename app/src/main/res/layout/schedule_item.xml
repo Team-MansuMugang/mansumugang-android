@@ -2,13 +2,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="@drawable/edit_round"
     android:gravity="center"
     android:layout_margin="30dp"
-    android:background="@drawable/edit_round"
-    android:padding="16dp"
     >
 
     <TextView
+        android:layout_marginTop="10dp"
+
         android:id="@+id/timeText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +17,6 @@
         android:text="시간"
         android:paddingBottom="10dp"
         android:drawableTop="@drawable/time"
-        android:background="@drawable/edit_border_bottom"
         android:textStyle="bold"
         android:textSize="30dp"/>
 
@@ -25,4 +25,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="btn"
+        android:id="@+id/TakingButtonAct"
+        />
+
 </LinearLayout>

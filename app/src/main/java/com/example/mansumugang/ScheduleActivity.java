@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -60,7 +65,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
         bottomNavigationView.setSelectedItemId(R.id.schedule);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);
 
-        layoutBox = findViewById(R.id.Layoutbox); // 이 부분을 추가합니다.
+        layoutBox = findViewById(R.id.Layoutbox);
 
 
 
@@ -78,18 +83,18 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
                 stopLocationService();
             }
             startLocationService();
-            // 오늘 날짜를 가져오기
-            Date today = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            String formattedDate = dateFormat.format(today);
 
             // 데이터 가져오기
-            fetchScheduleData(formattedDate);
+            fetchScheduleData(getTodayDate());
         }
 
 
     }
 
+    private String getTodayDate() {
+        SimpleDateFormat today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        return today.format(new Date());
+    }
 
     @Override
     public void onDateSelected(Date date) {
@@ -141,11 +146,8 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
             @Override
             public void onResponse(Call<ScheduleResponse> call, Response<ScheduleResponse> response) {
 
-                System.out.println("진입성공");
                 if (response.isSuccessful()) {
                     displaySchedule(response.body().getMedicineSchedules() ,response.body().getImageApiUrlPrefix() );
-                    System.out.println("wowowowow" + response.body().getImageApiUrlPrefix());
-                    System.out.println("출력 성공 : " + response.body());
                 } else {
                     Log.e(TAG, "Response unsuccessful or empty: " + response.message());
                 }
@@ -156,6 +158,60 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
                 Log.e(TAG, "API call failed: " + t.getMessage());
             }
         });
+
+    }
+
+    public void handleTakingButtonClick(List<Long> medicineIds) {
+
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        String token = App.prefs.getToken();
+        Date now = new Date();
+
+        // 날짜 형식 지정
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = dateFormatter.format(now);
+
+        // 시간 형식 지정
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+        String currentTime = timeFormatter.format(now);
+
+        String medicineIntakeTime = currentTime;
+        String scheduledMedicineIntakeDate = currentDate;
+
+        IntakeRequest intakeRequest = new IntakeRequest(medicineIds, medicineIntakeTime, scheduledMedicineIntakeDate);
+
+        Call<IntakeResponse> call = apiService.inTake("Bearer " + token, intakeRequest );
+
+        call.enqueue(new Callback<IntakeResponse>() {
+            @Override
+            public void onResponse(Call<IntakeResponse> call, Response<IntakeResponse> response) {
+                if (response.isSuccessful()) {
+                    // 성공적으로 응답을 받았을 때 처리
+                    IntakeResponse intakeResponse = response.body();
+
+                    // 성공적일때 fetchdata해서 패치
+                    if (intakeResponse != null) {
+                        // 응답 처리
+                        List<IntakeResponse.ToggleResponse> toggleResponses = intakeResponse.getToggleResponses();
+                        // ToggleResponse 처리 로직
+                        for (IntakeResponse.ToggleResponse toggleResponse : toggleResponses) {
+                            // 예: 로그 출력
+                            Log.d("ScheduleActivity", "Medicine ID: " + toggleResponse.getMedicineId() + ", Status: " + toggleResponse.getStatus());
+                        }
+                    }
+                } else {
+                    // 실패 처리
+                    Log.e("ScheduleActivity", "API 호출 실패: " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<IntakeResponse> call, Throwable t) {
+                Log.e("ScheduleActivity", "API 호출 실패", t);
+
+            }
+        });
+
 
     }
 
@@ -175,8 +231,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
         }
 
         for (ScheduleResponse.Schedule schedule : schedules) {
-            View scheduleView = ScheduleItem.createScheduleView(this, layoutBox, schedule, imageApiUrlPrefix);
-            layoutBox.addView(scheduleView);
+            ScheduleItem.createScheduleView(this, layoutBox, schedule, imageApiUrlPrefix);
         }
     }
 

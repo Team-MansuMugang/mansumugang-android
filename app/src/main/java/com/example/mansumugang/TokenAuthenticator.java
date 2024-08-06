@@ -69,13 +69,11 @@ public class TokenAuthenticator implements Authenticator {
 
             try {
                 // 토큰 갱신 요청
-                Log.d(TAG,"try block in          " + accessToken + " rt: " + refreshToken);
                 Call<RefreshTokenResponse> call = apiService.refreshToken(
                         "Bearer " + accessToken,
                         "Bearer " + refreshToken
                 );
                 retrofit2.Response<RefreshTokenResponse> tokenResponse = call.execute();
-                Log.d(TAG,"newtoken result" + tokenResponse);
 
                 if (tokenResponse.isSuccessful()) {
                     RefreshTokenResponse newToken = tokenResponse.body();

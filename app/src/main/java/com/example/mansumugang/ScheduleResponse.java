@@ -71,7 +71,7 @@ public class ScheduleResponse {
             private String medicineIntakeTime;
 
             @SerializedName("medicineId")
-            private int medicineId;
+            private long medicineId;
 
             @SerializedName("medicineImageName")
             private String medicineImageName;
@@ -106,7 +106,7 @@ public class ScheduleResponse {
                 this.medicineIntakeTime = medicineIntakeTime;
             }
 
-            public int getMedicineId() {
+            public long getMedicineId() {
                 return medicineId;
             }
 

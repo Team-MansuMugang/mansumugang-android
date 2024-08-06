@@ -74,6 +74,15 @@ public interface ApiService {
             @Query("date") String date);
 
 
-
+    /**
+     * 서버로 약 복용 토글을 요청합니다.
+     *
+     * @param accessToken 인증 토큰
+     * @return 서버로부터의 응답을 포함하는 Call 객체
+     */
+    @POST("api/medicine/intake/toggle")
+    Call<IntakeResponse> inTake(
+            @Header("Authorization") String accessToken
+            , @Body IntakeRequest inTakeRequest);
 
 }

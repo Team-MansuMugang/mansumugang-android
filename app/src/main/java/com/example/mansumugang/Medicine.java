@@ -2,7 +2,7 @@ package com.example.mansumugang;
 public class Medicine {
     private String status;
     private String medicineIntakeTime;
-    private int medicineId;
+    private long medicineId;
     private String medicineImageName;
     private String hospitalName;
     private String medicineDescription;
@@ -11,7 +11,7 @@ public class Medicine {
     public Medicine() {}
 
     // 생성자
-    public Medicine(String status, String medicineIntakeTime, int medicineId, String medicineImageName,
+    public Medicine(String status, String medicineIntakeTime, long medicineId, String medicineImageName,
                     String hospitalName, String medicineDescription, String medicineName, String imageApiUrlPrefix) {
         this.status = status;
         this.medicineIntakeTime = medicineIntakeTime;
@@ -39,7 +39,7 @@ public class Medicine {
         this.medicineIntakeTime = medicineIntakeTime;
     }
 
-    public int getMedicineId() {
+    public long getMedicineId() {
         return medicineId;
     }
 
