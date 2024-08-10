@@ -14,6 +14,8 @@ public class ScheduleResponse {
     @SerializedName("medicineSchedules")
     private List<Schedule> medicineSchedules;
 
+
+
     // Getters and setters
     public String getImageApiUrlPrefix() {
         return imageApiUrlPrefix;
@@ -46,6 +48,9 @@ public class ScheduleResponse {
         @SerializedName("medicines")
         private List<Medicine> medicines;
 
+        @SerializedName("hospital")
+        private Hospital hospital;
+
         // Getters and setters
         public String getTime() {
             return time;
@@ -61,6 +66,10 @@ public class ScheduleResponse {
 
         public void setMedicines(List<Medicine> medicines) {
             this.medicines = medicines;
+        }
+
+        public Hospital getHospital() { // Getter 추가
+            return hospital;
         }
 
         public static class Medicine {
@@ -151,5 +160,83 @@ public class ScheduleResponse {
                 this.medicineName = medicineName;
             }
         }
-    }
+        public static class Hospital {
+            @SerializedName("hospitalId")
+            private long hospitalId;
+
+            @SerializedName("hospitalAddress")
+            private String hospitalAddress;
+
+            @SerializedName("hospitalName")
+            private String hospitalName;
+
+            @SerializedName("latitude")
+            private double latitude;
+
+            @SerializedName("longitude")
+            private double longitude;
+
+            @SerializedName("hospitalDescription")
+            private String hospitalDescription;
+
+            @SerializedName("status")
+            private boolean status;
+
+// Getters and setters
+
+            public long getHospitalId() {
+                return hospitalId;
+            }
+
+            public void setHospitalId(long hospitalId) {
+                this.hospitalId = hospitalId;
+            }
+
+            public String getHospitalAddress() {
+                return hospitalAddress;
+            }
+
+            public String getHospitalName() {
+                return hospitalName;
+            }
+
+            public void setHospitalAddress(String hospitalAddress) {
+                this.hospitalAddress = hospitalAddress;
+            }
+
+            public double getLatitude() {
+                return latitude;
+            }
+
+            public void setLatitude(double latitude) {
+                this.latitude = latitude;
+            }
+
+            public double getLongitude() {
+                return longitude;
+            }
+
+            public void setLongitude(double longitude) {
+                this.longitude = longitude;
+            }
+
+            public String getHospitalDescription() {
+                return hospitalDescription;
+            }
+
+            public void setHospitalDescription(String hospitalDescription) {
+                this.hospitalDescription = hospitalDescription;
+            }
+
+            public boolean isHospitalStatus() {
+                return status;
+            }
+
+            public void setHospitalStatus(boolean status) {
+                this.status = status;
+            }
+
+        }
+
+        }
 }

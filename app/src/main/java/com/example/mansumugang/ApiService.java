@@ -1,12 +1,15 @@
 package com.example.mansumugang;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Header;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 /**
@@ -84,5 +87,24 @@ public interface ApiService {
     Call<IntakeResponse> inTake(
             @Header("Authorization") String accessToken
             , @Body IntakeRequest inTakeRequest);
+
+
+
+
+    /**
+     * 서버로 녹음파일의 저장을 요청합니다.
+     *
+     * @param accessToken 인증 토큰
+     * @return 서버로부터의 응답을 포함하는 Call 객체
+     */
+    @Multipart
+    @POST("api/record/save")
+    Call<SaveResponse> saveAudio(
+            @Header("Authorization") String accessToken
+            ,            @Part MultipartBody.Part audio
+
+            );
+
+
 
 }

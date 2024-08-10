@@ -8,13 +8,21 @@ public class IntakeRequest {
     @SerializedName("medicineIds")
     private List<Long> medicineIds;
 
+    @SerializedName("hospitalId")
+    private Long hospitalId;
+
     @SerializedName("medicineIntakeTime")
     private String medicineIntakeTime;
 
     @SerializedName("scheduledMedicineIntakeDate")
     private String scheduledMedicineIntakeDate;
 
+
+
     // Constructors
+    public IntakeRequest(Long hospitalId){
+        this.hospitalId = hospitalId;
+    }
     public IntakeRequest(List<Long> medicineIds, String medicineIntakeTime, String scheduledMedicineIntakeDate) {
         this.medicineIds = medicineIds;
         this.medicineIntakeTime = medicineIntakeTime;

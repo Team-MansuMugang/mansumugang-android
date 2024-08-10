@@ -3,14 +3,9 @@ package com.example.mansumugang;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Gravity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -18,16 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -161,30 +148,69 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
 
     }
 
-    public void handleTakingButtonClick(List<Long> medicineIds) {
-
+    public void handleTakingButtonClick(Long hospitalId){
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         String token = App.prefs.getToken();
+        IntakeRequest intakeRequest = new IntakeRequest(hospitalId);
+        Date now = new Date();
+
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        String currentDate = dateFormatter.format(now);
+
+        Call call = apiService.inTake("Bearer " + token, intakeRequest );
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                System.out.println(response);
+
+                if (response.isSuccessful()) {
+                    // 성공적으로 응답을 받았을 때 처리
+
+
+                    fetchScheduleData(currentDate);
+
+                } else {
+                    // 실패 처리
+                    Log.e("ScheduleActivity", "API 호출 실패: " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Log.e("ScheduleActivity", "API 호출 실패", t);
+
+            }
+        });
+    }
+
+    public void handleTakingButtonClick(List<Long> medicineIds , String medicineIntakeTime) {
+
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         Date now = new Date();
 
         // 날짜 형식 지정
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
         String currentDate = dateFormatter.format(now);
 
-        // 시간 형식 지정
-        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
-        String currentTime = timeFormatter.format(now);
 
-        String medicineIntakeTime = currentTime;
+
         String scheduledMedicineIntakeDate = currentDate;
 
         IntakeRequest intakeRequest = new IntakeRequest(medicineIds, medicineIntakeTime, scheduledMedicineIntakeDate);
+        System.out.println(medicineIds);
+        System.out.println(medicineIntakeTime);
+        System.out.println(scheduledMedicineIntakeDate);
+        String token = App.prefs.getToken();
 
         Call<IntakeResponse> call = apiService.inTake("Bearer " + token, intakeRequest );
 
         call.enqueue(new Callback<IntakeResponse>() {
             @Override
             public void onResponse(Call<IntakeResponse> call, Response<IntakeResponse> response) {
+                System.out.println(response);
+
                 if (response.isSuccessful()) {
                     // 성공적으로 응답을 받았을 때 처리
                     IntakeResponse intakeResponse = response.body();
@@ -192,12 +218,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
                     // 성공적일때 fetchdata해서 패치
                     if (intakeResponse != null) {
                         // 응답 처리
-                        List<IntakeResponse.ToggleResponse> toggleResponses = intakeResponse.getToggleResponses();
-                        // ToggleResponse 처리 로직
-                        for (IntakeResponse.ToggleResponse toggleResponse : toggleResponses) {
-                            // 예: 로그 출력
-                            Log.d("ScheduleActivity", "Medicine ID: " + toggleResponse.getMedicineId() + ", Status: " + toggleResponse.getStatus());
-                        }
+                        fetchScheduleData(currentDate);
                     }
                 } else {
                     // 실패 처리

@@ -1,41 +1,48 @@
 package com.example.mansumugang;
 
-import android.content.ContentValues;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.os.SystemClock;
-import android.provider.MediaStore;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
-/**
- * RecordActivity 클래스는 오디오 녹음을 관리합니다.
- */
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class RecordActivity extends AppCompatActivity {
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    private static final String[] PERMISSIONS = {
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
     private MediaRecorder mediaRecorder;
     private boolean isRecording = false;
     private String filePath = "";
+    private File audioFile;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording);
 
@@ -44,8 +51,37 @@ public class RecordActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.recording);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);
 
+        if (!hasPermissions()) {
+            requestAudioPermissions();
+        }
 
         initializeRecordingButtons();
+    }
+
+    private boolean hasPermissions() {
+        for (String permission : PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void requestAudioPermissions() {
+        ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_RECORD_AUDIO_PERMISSION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initializeRecordingButtons();
+            } else {
+                Toast.makeText(this, "Permissions are required to record audio", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
     }
 
     /**
@@ -62,7 +98,7 @@ public class RecordActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!isRecording) {
-                    filePath = startRecording();
+                    startRecording();
                 }
             }
         });
@@ -71,7 +107,7 @@ public class RecordActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!isRecording) {
-                    filePath = startRecording();
+                    startRecording();
                 }
             }
         });
@@ -82,6 +118,8 @@ public class RecordActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (isRecording) {
                     stopRecording();
+                    convertAudio();
+
                 }
             }
         });
@@ -114,12 +152,11 @@ public class RecordActivity extends AppCompatActivity {
             recordButton.setVisibility(View.GONE);
             recordingButtonBox.setVisibility(View.VISIBLE);
 
-            filePath = setupMediaRecorder(); // MediaRecorder를 설정합니다.
+            filePath = setupMediaRecorder();
 
-            // 녹음을 준비하고 시작합니다.
             mediaRecorder.prepare();
             mediaRecorder.start();
-            isRecording = true; // 녹음 상태를 true로 변경합니다.
+            isRecording = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -134,12 +171,14 @@ public class RecordActivity extends AppCompatActivity {
      */
     private String setupMediaRecorder() throws IOException {
         mediaRecorder = new MediaRecorder();
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC); // 오디오 소스 설정
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4); // 출력 형식 설정
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB); // 오디오 인코더 설정
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-        String filePath = createFilePath() + createFileName() + ".mp3";
+        String filePath = createFilePath() + createFileName() + ".3gp";
+        System.out.println(filePath);
         mediaRecorder.setOutputFile(filePath);
+        audioFile = new File(filePath);
         return filePath;
     }
 
@@ -149,7 +188,7 @@ public class RecordActivity extends AppCompatActivity {
      * @return 파일 경로
      */
     private String createFilePath() {
-        return Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Environment.DIRECTORY_DOCUMENTS + "/";
+        return getCacheDir().getAbsolutePath() + "/";
     }
 
     /**
@@ -158,19 +197,7 @@ public class RecordActivity extends AppCompatActivity {
      * @return 파일 이름
      */
     private String createFileName() {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        return "REC_" + timeStamp;
-    }
-
-    /**
-     * 녹음을 취소하는 메소드입니다.
-     * 녹음을 중지하고 파일을 삭제합니다.
-     */
-    protected void cancelRecording() {
-        stopRecording();
-        System.out.println("파일 경로: " + filePath);
-        File file = new File(filePath);
-        file.delete();
+        return "REC_" + System.currentTimeMillis();
     }
 
     /**
@@ -178,19 +205,90 @@ public class RecordActivity extends AppCompatActivity {
      */
     private void stopRecording() {
         if (mediaRecorder != null) {
-            Button recordButton = findViewById(R.id.recording_start_button);
-            LinearLayout recordingButtonBox = findViewById(R.id.recording_button_box);
-            Chronometer chronometer = findViewById(R.id.recording_time);
+            try {
+                Button recordButton = findViewById(R.id.recording_start_button);
+                LinearLayout recordingButtonBox = findViewById(R.id.recording_button_box);
+                Chronometer chronometer = findViewById(R.id.recording_time);
 
-            chronometer.stop();
-            chronometer.setBase(SystemClock.elapsedRealtime());
-            recordButton.setVisibility(View.VISIBLE);
-            recordingButtonBox.setVisibility(View.GONE);
+                chronometer.stop();
+                chronometer.setBase(SystemClock.elapsedRealtime());
+                recordButton.setVisibility(View.VISIBLE);
+                recordingButtonBox.setVisibility(View.GONE);
 
-            mediaRecorder.stop(); // 녹음을 중지합니다.
-            mediaRecorder.release(); // MediaRecorder 리소스를 해제합니다.
-            mediaRecorder = null; // MediaRecorder 객체를 null로 설정합니다.
-            isRecording = false; // 녹음 상태를 false로 변경합니다.
+                mediaRecorder.stop();
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            } finally {
+                mediaRecorder.reset();
+                mediaRecorder.release();
+                mediaRecorder = null;
+                isRecording = false;
+            }
         }
+    }
+
+    private void cancelRecording() {
+        stopRecording();
+        if (audioFile.exists() && audioFile.delete()) {
+            Toast.makeText(this, "Recording cancelled and file deleted.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void convertAudio() {
+        String inputPath = audioFile.getAbsolutePath(); // 3GP 파일 경로
+        String outputPath = inputPath.replace(".3gp", ".mp3"); // 변환될 MP3 파일 경로
+
+        // AudioConverter를 사용하여 3GP 파일을 MP3로 변환
+        AudioConverter converter = new AudioConverter();
+        converter.convert3gpToMp3(inputPath, outputPath, new AudioConverter.ConversionCallback() {
+            @Override
+            public void onSuccess(File convertedFile) {
+                // 변환 성공 시 파일을 서버에 업로드
+                String token = App.prefs.getToken();
+                audioFile.delete();
+                uploadFileWithRetry(token, convertedFile);
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                // 변환 실패 처리
+                Toast.makeText(RecordActivity.this, "Audio conversion failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    private void uploadFileWithRetry(String token, File audioFile) {
+        if (audioFile != null && audioFile.exists()) {
+            RequestBody requestFile = RequestBody.create(audioFile, MediaType.parse("audio/3gp"));
+            MultipartBody.Part body = MultipartBody.Part.createFormData("audio", audioFile.getName(), requestFile);
+
+            ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+            Call<SaveResponse> call = apiService.saveAudio("Bearer " + token, body);
+            call.enqueue(new Callback<SaveResponse>() {
+                @Override
+                public void onResponse(Call<SaveResponse> call, Response<SaveResponse> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(RecordActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
+                        if (audioFile.exists()){ audioFile.delete(); }
+                    } else {
+                        handleUploadFailure(call, token, audioFile);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SaveResponse> call, Throwable t) {
+                    handleUploadFailure(call, token, audioFile);
+                }
+            });
+        } else {
+            Toast.makeText(this, "No file to upload", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void handleUploadFailure(Call<SaveResponse> call, String token, File audioFile) {
+        // Retry logic here
+        Toast.makeText(this, "Upload failed, retrying...", Toast.LENGTH_SHORT).show();
+        uploadFileWithRetry(token, audioFile);
     }
 }
