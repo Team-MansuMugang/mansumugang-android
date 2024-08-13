@@ -6,26 +6,19 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-
 import androidx.core.app.NotificationCompat;
 
-/**
- * LocationNotificationHelper 클래스는 위치 서비스와 관련된 알림 생성 기능을 제공합니다.
- */
 public class LocationNotificationHelper {
+
     private Context context;
+    private static final String LOCATION_CHANNEL_ID = Constants.LOCATION_CHANNEL_ID;
+    private static final int LOCATION_NOTIFICATION_ID = Constants.LOCATION_NOTIFICATION_ID; // 고유한 알림 ID
 
     public LocationNotificationHelper(Context context) {
         this.context = context;
     }
 
-    /**
-     * 알림을 생성하기 위한 NotificationCompat.Builder 객체를 반환합니다.
-     *
-     * @return NotificationCompat.Builder 객체
-     */
     public NotificationCompat.Builder getNotificationBuilder() {
-        // 알림을 클릭했을 때 실행될 인텐트 생성
         Intent resultIntent = new Intent();
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
@@ -34,36 +27,47 @@ public class LocationNotificationHelper {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        // 알림을 빌드하는 NotificationCompat.Builder 생성
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Constants.CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, LOCATION_CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Location Service")
+                .setContentTitle("만수무강 위치 서비스")
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setContentText("Running")
+                .setContentText("실행중")
                 .setContentIntent(pendingIntent)
-                .setAutoCancel(false)
-                .setPriority(NotificationCompat.PRIORITY_MAX);
+                .setAutoCancel(false) // 사용자가 클릭해도 알림이 사라지지 않게 설정
+                .setOngoing(true) // 알림을 사용자가 제거할 수 없도록 설정
+                .setPriority(NotificationCompat.PRIORITY_LOW); // 낮은 우선순위
 
-        // 알림 채널 생성
         createNotificationChannel();
         return builder;
     }
 
-    /**
-     * 알림 채널을 생성합니다 (Android 8.0 이상).
-     */
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            if (notificationManager != null && notificationManager.getNotificationChannel(Constants.CHANNEL_ID) == null) {
+            if (notificationManager != null && notificationManager.getNotificationChannel(LOCATION_CHANNEL_ID) == null) {
                 NotificationChannel notificationChannel = new NotificationChannel(
-                        Constants.CHANNEL_ID,
+                        LOCATION_CHANNEL_ID,
                         "Location Service",
-                        NotificationManager.IMPORTANCE_HIGH
+                        NotificationManager.IMPORTANCE_LOW
                 );
                 notificationChannel.setDescription("This channel is used by location service");
                 notificationManager.createNotificationChannel(notificationChannel);
             }
+        }
+    }
+
+    public void showNotification() {
+        NotificationCompat.Builder builder = getNotificationBuilder();
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.notify(LOCATION_NOTIFICATION_ID, builder.build());
+        }
+    }
+
+    public void hideNotification() {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.cancel(LOCATION_NOTIFICATION_ID); // 특정 ID의 알림을 제거
         }
     }
 }
