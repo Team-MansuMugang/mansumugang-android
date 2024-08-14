@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,12 +34,15 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
     private static final String TAG = "ScheduleActivity";
     private WeekCalendarAdapter weekCalendarAdapter;
     private LinearLayout layoutBox;
+    private ScrollView scrollView;
+    private String hospitalName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
 
+        scrollView = findViewById(R.id.scrollViewBox);
         // RecyclerView 초기화
         weekRecyclerView = findViewById(R.id.weekRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -134,7 +139,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
             public void onResponse(Call<ScheduleResponse> call, Response<ScheduleResponse> response) {
 
                 if (response.isSuccessful()) {
-                    displaySchedule(response.body().getMedicineSchedules() ,response.body().getImageApiUrlPrefix() );
+                    displaySchedule(response.body());
                 } else {
                     Log.e(TAG, "Response unsuccessful or empty: " + response.message());
                 }
@@ -148,15 +153,12 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
 
     }
 
-    public void handleTakingButtonClick(Long hospitalId){
+    public void handleTakingButtonClick(Long hospitalId , String date){
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         String token = App.prefs.getToken();
         IntakeRequest intakeRequest = new IntakeRequest(hospitalId);
-        Date now = new Date();
 
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
-        String currentDate = dateFormatter.format(now);
 
         Call call = apiService.inTake("Bearer " + token, intakeRequest );
 
@@ -169,7 +171,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
                     // 성공적으로 응답을 받았을 때 처리
 
 
-                    fetchScheduleData(currentDate);
+                    fetchScheduleData(date);
 
                 } else {
                     // 실패 처리
@@ -185,23 +187,14 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
         });
     }
 
-    public void handleTakingButtonClick(List<Long> medicineIds , String medicineIntakeTime) {
+    public void handleTakingButtonClick(List<Long> medicineIds , String medicineIntakeTime ,String date) {
 
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-        Date now = new Date();
 
-        // 날짜 형식 지정
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-        String currentDate = dateFormatter.format(now);
-
-
-
-        String scheduledMedicineIntakeDate = currentDate;
-
-        IntakeRequest intakeRequest = new IntakeRequest(medicineIds, medicineIntakeTime, scheduledMedicineIntakeDate);
+        IntakeRequest intakeRequest = new IntakeRequest(medicineIds, medicineIntakeTime, date);
         System.out.println(medicineIds);
         System.out.println(medicineIntakeTime);
-        System.out.println(scheduledMedicineIntakeDate);
+        System.out.println(date);
         String token = App.prefs.getToken();
 
         Call<IntakeResponse> call = apiService.inTake("Bearer " + token, intakeRequest );
@@ -218,7 +211,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
                     // 성공적일때 fetchdata해서 패치
                     if (intakeResponse != null) {
                         // 응답 처리
-                        fetchScheduleData(currentDate);
+                        fetchScheduleData(date);
                     }
                 } else {
                     // 실패 처리
@@ -236,8 +229,11 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
 
     }
 
-    private void displaySchedule(List<ScheduleResponse.Schedule> schedules, String imageApiUrlPrefix) {
+    private void displaySchedule(ScheduleResponse scheduleResponse) {
+
+        List<ScheduleResponse.Schedule> schedules = scheduleResponse.getMedicineSchedules();
         layoutBox.removeAllViews();
+
         if (schedules == null || schedules.isEmpty()) {
             TextView emptyView = new TextView(this);
             emptyView.setText("오늘의 일정이 없습니다.");
@@ -251,9 +247,40 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
             return;
         }
 
+        List<List> medicineNames = new ArrayList<>();
+
         for (ScheduleResponse.Schedule schedule : schedules) {
-            ScheduleItem.createScheduleView(this, layoutBox, schedule, imageApiUrlPrefix);
+            ScheduleItem.createScheduleView(this, layoutBox,  schedule, scheduleResponse.getImageApiUrlPrefix(),scheduleResponse.getDate() ,scrollView);
+            schedule.getTime();
+            // 스케줄에 포함된 약물들의 ID를 medicineIds 리스트에 추가
+
+            List<String> medicineNamesIn = new ArrayList<>();
+
+            // 스케줄에 포함된 병원의 ID를 hospitalId 정의
+            if (schedule.getHospital() != null) {
+                hospitalName = schedule.getHospital().getHospitalName() + " hpItem";
+                medicineNamesIn.add(hospitalName);
+            }
+
+            medicineNamesIn.add(scheduleResponse.getDate());
+            medicineNamesIn.add(schedule.getTime());
+            for (ScheduleResponse.Schedule.Medicine medicine : schedule.getMedicines()) {
+                medicineNamesIn.add(medicine.getMedicineName());
+            }
+
+            medicineNames.add(medicineNamesIn);
+
+
         }
+        System.out.println(medicineNames );
+//        AlarmScheduler.scheduleAlarms(this, medicineNames);
+        AlarmScheduler.cancelAllAlarms(this);  // 기존의 알람 모두 제거
+        AlarmScheduler.scheduleAlarms(this, medicineNames);  // 새롭게 알람 설정
+
+
+            // 알람 설정 주기 어떡할지? 계속 받아오기 ??
+
+
     }
 
 }

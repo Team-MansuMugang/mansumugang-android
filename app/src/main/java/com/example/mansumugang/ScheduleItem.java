@@ -7,11 +7,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class ScheduleItem {
@@ -25,11 +30,20 @@ public class ScheduleItem {
      * @param imageApiUrlPrefix String
      * @return View
      */
-    public static View createScheduleView(Context context, LinearLayout layoutBox, ScheduleResponse.Schedule schedule, String imageApiUrlPrefix) {
+    public static View createScheduleView(Context context, LinearLayout layoutBox, ScheduleResponse.Schedule schedule, String imageApiUrlPrefix , String date , ScrollView scrollView) {
         // 스케줄 아이템 레이아웃을 인플레이트
+
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        Date currentTime = new Date();
+        String scheduleTimeStr = schedule.getTime();
+
+
         View scheduleView = LayoutInflater.from(context).inflate(R.layout.schedule_item, layoutBox, false);
         TextView timeView = scheduleView.findViewById(R.id.timeText);
-        timeView.setText(" " + schedule.getTime());
+        timeView.setText(" " + scheduleTimeStr);
+
+
 
         // layoutBox에 scheduleView를 추가
         layoutBox.addView(scheduleView);
@@ -48,7 +62,7 @@ public class ScheduleItem {
             // TakingButton 클릭 리스너 설정
             takingButton.setOnClickListener(v -> {
                 if (context instanceof ScheduleActivity) {
-                    ((ScheduleActivity) context).handleTakingButtonClick(schedule.getHospital().getHospitalId());
+                    ((ScheduleActivity) context).handleTakingButtonClick(schedule.getHospital().getHospitalId() , date);
                 }
             });
         }
@@ -72,9 +86,41 @@ public class ScheduleItem {
             // TakingButton 클릭 리스너 설정
             takingButton.setOnClickListener(v -> {
                 if (context instanceof ScheduleActivity) {
-                    ((ScheduleActivity) context).handleTakingButtonClick(medicineIds , schedule.getTime());
+                    ((ScheduleActivity) context).handleTakingButtonClick(medicineIds , schedule.getTime(), date);
                 }
             });
+        }
+
+        try {
+            Date scheduleTime = timeFormat.parse(scheduleTimeStr);
+
+            if (scheduleTime.before(currentTime)){
+                // 특정 조건을 만족하는 경우 additionalBox로 스크롤
+                scrollView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // ScrollView의 LinearLayout의 위치로 스크롤 이동
+                        int childIndex = layoutBox.indexOfChild(scheduleView);
+                        if (childIndex != -1) {
+                            try {
+                                View childView = layoutBox.getChildAt(childIndex+1);
+                                scrollView.scrollTo(0, childView.getTop());
+
+
+                            } catch (Exception e)
+                            {
+                                View childView = layoutBox.getChildAt(childIndex);
+                                scrollView.scrollTo(0, childView.getTop());
+
+                            }
+                        }
+                    }
+                });
+                return scheduleView;
+
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
         return scheduleView;
@@ -101,6 +147,7 @@ public class ScheduleItem {
         descriptionView.setText(hospital.getHospitalDescription());
 
 
+//        첨부 이미지 사용
 //        if (hospital.getMedicineImageName() == null) {
 //            hospitalImage.setImageDrawable(context.getResources().getDrawable(R.drawable.hospital));
 //            hospitalImage.setScaleType(ImageView.ScaleType.FIT_CENTER);

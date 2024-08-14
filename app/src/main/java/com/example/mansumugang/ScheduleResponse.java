@@ -15,7 +15,6 @@ public class ScheduleResponse {
     private List<Schedule> medicineSchedules;
 
 
-
     // Getters and setters
     public String getImageApiUrlPrefix() {
         return imageApiUrlPrefix;
