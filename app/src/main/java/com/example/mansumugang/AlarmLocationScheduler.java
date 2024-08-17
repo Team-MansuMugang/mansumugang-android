@@ -143,7 +143,7 @@ public class AlarmLocationScheduler {
                 Log.d(TAG, "One hour before: " + formatCalendarTime(oneHourBefore));
                 Log.d(TAG, "One hour after: " + formatCalendarTime(oneHourAfter));
                 Log.d(TAG, "Is oneHourAfter before currentTime? " + oneHourAfter.before(currentTime));
-                Log.d(TAG, "Is one hour before After currentTime ? " + oneHourBefore.after(currentTime));
+                Log.d(TAG, "Is one hour before After currentTime ? " + oneHourBefore.after(currentTime)); // @
 
                 // 현재 시간이 스케줄 시간의 1시간 전후 범위에 있는지 확인합니다.
                 if (!currentTime.before(oneHourBefore) && !currentTime.after(oneHourAfter)) {
