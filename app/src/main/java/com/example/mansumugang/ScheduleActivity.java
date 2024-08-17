@@ -1,16 +1,21 @@
 package com.example.mansumugang;
+import android.Manifest;
 
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,12 +41,16 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
     private LinearLayout layoutBox;
     private ScrollView scrollView;
     private String hospitalName;
+    private static final int REQUEST_PERMISSIONS = 1;
+
+    private AlarmLocationScheduler alarmLocationScheduler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
-
+        checkAndRequestPermissions();
         scrollView = findViewById(R.id.scrollViewBox);
         // RecyclerView 초기화
         weekRecyclerView = findViewById(R.id.weekRecyclerView);
@@ -59,6 +68,9 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
 
         layoutBox = findViewById(R.id.Layoutbox);
 
+        // alarmLocationScheduler 초기화
+
+
 
 
         // 토큰 확인
@@ -70,17 +82,51 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
             overridePendingTransition(0, 0);
             finish(); // 현재 액티비티를 종료하여 백 스택에서 제거
         } else {
-            // 토큰이 있으면 위치 서비스 시작
-            if (isLocationServiceRunning()) {
-                stopLocationService();
-            }
-            startLocationService();
+            // 토큰이 있으면 알람 패처를 시작
+            String todayDate = getTodayDate(); // 현재 날짜를 가져옴
+            AlarmLocationScheduler scheduler = new AlarmLocationScheduler(this);
+            scheduler.startScheduling(todayDate);
 
-            // 데이터 가져오기
-            fetchScheduleData(getTodayDate());
+            fetchScheduleData(todayDate);
         }
 
 
+    }
+
+    /**
+     * 권한이 허용되었는지 확인하고 필요한 경우 요청합니다.
+     */
+    private void checkAndRequestPermissions() {
+        List<String> permissionsNeeded = new ArrayList<>();
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION); // allow all the time 으로는 사용자가 수정해야함
+        }
+
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            permissionsNeeded.add(Manifest.permission.RECORD_AUDIO);
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            permissionsNeeded.add(Manifest.permission.POST_NOTIFICATIONS);
+        }
+
+        if (!permissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, permissionsNeeded.toArray(new String[0]), REQUEST_PERMISSIONS);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PERMISSIONS) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "권한이 거부되었습니다: " + permissions[i], Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
     private String getTodayDate() {
@@ -111,23 +157,6 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
         return false;
     }
 
-    /**
-     * 위치 서비스를 시작합니다.
-     */
-    private void startLocationService() {
-        Intent intent = new Intent(this, LocationService.class);
-        intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
-        startService(intent);
-    }
-
-    /**
-     * 위치 서비스를 중지합니다.
-     */
-    private void stopLocationService() {
-        Intent intent = new Intent(this, LocationService.class);
-        intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
-        startService(intent);
-    }
 
     private void fetchScheduleData(String date) {
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
@@ -247,38 +276,9 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
             return;
         }
 
-        List<List> medicineNames = new ArrayList<>();
-
         for (ScheduleResponse.Schedule schedule : schedules) {
             ScheduleItem.createScheduleView(this, layoutBox,  schedule, scheduleResponse.getImageApiUrlPrefix(),scheduleResponse.getDate() ,scrollView);
-            schedule.getTime();
-            // 스케줄에 포함된 약물들의 ID를 medicineIds 리스트에 추가
-
-            List<String> medicineNamesIn = new ArrayList<>();
-
-            // 스케줄에 포함된 병원의 ID를 hospitalId 정의
-            if (schedule.getHospital() != null) {
-                hospitalName = schedule.getHospital().getHospitalName() + " hpItem";
-                medicineNamesIn.add(hospitalName);
-            }
-
-            medicineNamesIn.add(scheduleResponse.getDate());
-            medicineNamesIn.add(schedule.getTime());
-            for (ScheduleResponse.Schedule.Medicine medicine : schedule.getMedicines()) {
-                medicineNamesIn.add(medicine.getMedicineName());
-            }
-
-            medicineNames.add(medicineNamesIn);
-
-
         }
-        System.out.println(medicineNames );
-//        AlarmScheduler.scheduleAlarms(this, medicineNames);
-        AlarmScheduler.cancelAllAlarms(this);  // 기존의 알람 모두 제거
-        AlarmScheduler.scheduleAlarms(this, medicineNames);  // 새롭게 알람 설정
-
-
-            // 알람 설정 주기 어떡할지? 계속 받아오기 ??
 
 
     }

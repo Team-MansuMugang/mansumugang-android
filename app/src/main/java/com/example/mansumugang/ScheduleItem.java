@@ -30,20 +30,15 @@ public class ScheduleItem {
      * @param imageApiUrlPrefix String
      * @return View
      */
-    public static View createScheduleView(Context context, LinearLayout layoutBox, ScheduleResponse.Schedule schedule, String imageApiUrlPrefix , String date , ScrollView scrollView) {
-        // 스케줄 아이템 레이아웃을 인플레이트
-
-
+    public static View createScheduleView(Context context, LinearLayout layoutBox, ScheduleResponse.Schedule schedule, String imageApiUrlPrefix, String date, ScrollView scrollView) {
+        final int[] beforeIndex = {0};
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
         Date currentTime = new Date();
         String scheduleTimeStr = schedule.getTime();
 
-
         View scheduleView = LayoutInflater.from(context).inflate(R.layout.schedule_item, layoutBox, false);
         TextView timeView = scheduleView.findViewById(R.id.timeText);
         timeView.setText(" " + scheduleTimeStr);
-
-
 
         // layoutBox에 scheduleView를 추가
         layoutBox.addView(scheduleView);
@@ -58,11 +53,11 @@ public class ScheduleItem {
             // 병원 정보가 있는 경우, 병원 뷰를 생성하여 추가
             View hospitalView = createHospitalView(context, schedule.getHospital());
             additionalBox.addView(hospitalView);
-            setTakingHospitalButtonAttributes(context, takingButton , schedule.getHospital().isHospitalStatus() );
+            setTakingHospitalButtonAttributes(context, takingButton, schedule.getHospital().isHospitalStatus());
             // TakingButton 클릭 리스너 설정
             takingButton.setOnClickListener(v -> {
                 if (context instanceof ScheduleActivity) {
-                    ((ScheduleActivity) context).handleTakingButtonClick(schedule.getHospital().getHospitalId() , date);
+                    ((ScheduleActivity) context).handleTakingButtonClick(schedule.getHospital().getHospitalId(), date);
                 }
             });
         }
@@ -77,54 +72,47 @@ public class ScheduleItem {
         }
 
         // TakingButton 설정
-        // 약물 상태에 따라 TakingButton 속성 설정
         if (!medicineIds.isEmpty()) {
-            // 리스트의 첫 번째 약물 ID를 사용하여 버튼 속성 설정
             ScheduleResponse.Schedule.Medicine firstMedicine = schedule.getMedicines().get(0);
             setTakingMeicineButtonAttributes(context, takingButton, firstMedicine);
-
-            // TakingButton 클릭 리스너 설정
             takingButton.setOnClickListener(v -> {
                 if (context instanceof ScheduleActivity) {
-                    ((ScheduleActivity) context).handleTakingButtonClick(medicineIds , schedule.getTime(), date);
+                    ((ScheduleActivity) context).handleTakingButtonClick(medicineIds, schedule.getTime(), date);
                 }
             });
         }
 
         try {
             Date scheduleTime = timeFormat.parse(scheduleTimeStr);
+            if (scheduleTime.before(currentTime)) {
+                beforeIndex[0] += 1; // 스케줄 시간이 현재 시간보다 이전이면 beforeIndex 증가
+            }
 
-            if (scheduleTime.before(currentTime)){
-                // 특정 조건을 만족하는 경우 additionalBox로 스크롤
-                scrollView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        // ScrollView의 LinearLayout의 위치로 스크롤 이동
-                        int childIndex = layoutBox.indexOfChild(scheduleView);
-                        if (childIndex != -1) {
-                            try {
-                                View childView = layoutBox.getChildAt(childIndex+1);
-                                scrollView.scrollTo(0, childView.getTop());
+            // 특정 조건을 만족하는 경우 additionalBox로 스크롤
+            scrollView.post(new Runnable() {
+                @Override
+                public void run() {
+                    // ScrollView의 LinearLayout의 위치로 스크롤 이동
+                    int childIndex = layoutBox.indexOfChild(scheduleView);
+                    if (childIndex != -1) {
+                        try {
+                            View childView = layoutBox.getChildAt(beforeIndex[0]);
+                            scrollView.scrollTo(0, childView.getTop());
+                        } catch (Exception e) {
 
-
-                            } catch (Exception e)
-                            {
-                                View childView = layoutBox.getChildAt(childIndex);
-                                scrollView.scrollTo(0, childView.getTop());
-
-                            }
                         }
                     }
-                });
-                return scheduleView;
-
-            }
+                }
+            });
+            return scheduleView;
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         return scheduleView;
     }
+
+
 
     private static View createHospitalView(Context context, ScheduleResponse.Schedule.Hospital hospital) {
         View medicineView = LayoutInflater.from(context).inflate(R.layout.medicine_item, null, false);
@@ -146,27 +134,6 @@ public class ScheduleItem {
         hodpitalLocationView.setText(hospital.getHospitalAddress());
         descriptionView.setText(hospital.getHospitalDescription());
 
-
-//        첨부 이미지 사용
-//        if (hospital.getMedicineImageName() == null) {
-//            hospitalImage.setImageDrawable(context.getResources().getDrawable(R.drawable.hospital));
-//            hospitalImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-//            hospitalImage.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
-//            hospitalImage.getLayoutParams().height = 700;
-//
-//        } else {
-//            ViewGroup.LayoutParams params = hospitalImage.getLayoutParams();
-//            hospitalImage.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
-//            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-//            hospitalImage.getLayoutParams().height = 700;
-//
-//            hospitalImage.setLayoutParams(params);
-//            String imageUrl = imageApiUrlPrefix + medicine.getMedicineImageName();
-//            Glide.with(context)
-//                    .load(imageUrl)
-//
-//                    .into(hospitalImage);
-//        }
         return medicineView;
 
     }
@@ -251,7 +218,6 @@ public class ScheduleItem {
         }
     }
     private static void setTakingHospitalButtonAttributes(Context context, Button takingButton, Boolean status) {
-        System.out.println(status);
         if (status) {
             takingButton.setText("병원을 방문하셨어요!");
             takingButton.setBackgroundColor(context.getResources().getColor(R.color.Gray45));

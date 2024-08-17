@@ -11,7 +11,6 @@ public class LocationService extends Service {
 
     private LocationHelper locationHelper;
     private LocationNotificationHelper notificationHelper;
-    private boolean isServiceRunning = false; // 서비스 실행 상태를 추적하기 위한 변수
 
     @Nullable
     @Override
@@ -27,26 +26,11 @@ public class LocationService extends Service {
     }
 
     private void startLocationService() {
-        if (!isServiceRunning) { // 서비스가 이미 실행 중인지 확인
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationCompat.Builder builder = notificationHelper.getNotificationBuilder();
-                startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
-            }
-            locationHelper.startLocationUpdates();
-            isServiceRunning = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationCompat.Builder builder = notificationHelper.getNotificationBuilder();
+            startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
         }
-    }
-
-    private void stopLocationService() {
-        if (isServiceRunning) { // 서비스가 실행 중인 경우에만 중지
-            locationHelper.stopLocationUpdates();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                stopForeground(true);
-            }
-            notificationHelper.hideNotification(); // 위치 서비스 중지 시 알림 숨기기
-            stopSelf();
-            isServiceRunning = false;
-        }
+        locationHelper.fetchLocationOnce(); // 위치를 한 번만 요청
     }
 
     @Override
@@ -61,6 +45,16 @@ public class LocationService extends Service {
                 }
             }
         }
-        return START_STICKY;
+        // 서비스가 중지될 때 stopSelf()를 호출하여 서비스 종료
+        stopSelf();
+        return START_NOT_STICKY; // 서비스가 종료되면 다시 시작되지 않음
+    }
+
+    private void stopLocationService() {
+        // 위치 업데이트 중지 호출
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            stopForeground(true);
+        }
+        notificationHelper.hideNotification(); // 위치 서비스 중지 시 알림 숨기기
     }
 }

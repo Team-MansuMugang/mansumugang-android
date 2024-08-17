@@ -80,6 +80,14 @@ public class LoginActivity extends AppCompatActivity {
                     // 성공적으로 응답을 받은 경우
                     LoginResponse loginResponse = response.body();
                     if (loginResponse != null) {
+                        if (loginResponse.getUserType().equals("USER_PROTECTOR"))
+                        {
+                            // USER_PROTECTOR인 경우
+                            loginIdEditText.setText("");
+                            loginPasswordEditText.setText("");
+                            Toast.makeText(LoginActivity.this, "환자 아이디로 로그인 하세요!", Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         String accessToken = loginResponse.getAccessToken();
                         App.prefs.setToken(accessToken); // 액세스 토큰 저장
 
@@ -87,7 +95,6 @@ public class LoginActivity extends AppCompatActivity {
                         App.prefs.setRefreshToken(refreshToken); // 리프레시 토큰 저장
 
                         String userType = loginResponse.getUserType();
-                        App.prefs.setUserType(userType); // 사용자 유형 저장
 
                         String savedToken = App.prefs.getToken();
                         String RefreshToken = App.prefs.getRefreshToken();

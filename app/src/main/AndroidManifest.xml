@@ -54,9 +54,10 @@
             android:name=".LocationService"
             android:exported="true"
             android:foregroundServiceType="location" />
-
-        <receiver android:name=".AlarmReceiver" />
-
+        <receiver
+            android:name=".AlarmReceiver"
+            android:enabled="true"
+            android:exported="true" />
 
 
     </application>
