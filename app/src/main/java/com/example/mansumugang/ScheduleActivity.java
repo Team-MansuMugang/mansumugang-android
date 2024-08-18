@@ -40,10 +40,8 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
     private WeekCalendarAdapter weekCalendarAdapter;
     private LinearLayout layoutBox;
     private ScrollView scrollView;
-    private String hospitalName;
     private static final int REQUEST_PERMISSIONS = 1;
 
-    private AlarmLocationScheduler alarmLocationScheduler;
 
 
     @Override

@@ -204,7 +204,6 @@ public class ScheduleItem {
             takingButton.setText("약을 안 드셨어요");
             takingButton.setTextColor(context.getResources().getColor(R.color.White));
             takingButton.setBackgroundColor(context.getResources().getColor(R.color.ImportantError));
-            takingButton.setEnabled(false);
         } else if (medicine.isStatus().equals("PASS")) {
             takingButton.setText("약이 최근에 추가 되었어요");
             takingButton.setTextColor(context.getResources().getColor(R.color.White));

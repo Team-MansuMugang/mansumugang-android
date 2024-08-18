@@ -25,6 +25,9 @@ import retrofit2.Response;
 public class LocationHelper {
 
     private static final String TAG = "LocationHelper";
+    private static final long LOCATION_UPDATE_INTERVAL_MS = 10000; // 10초
+    private static final long LOCATION_UPDATE_FASTEST_INTERVAL_MS = 5000; // 5초
+
     private Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationCallback locationCallback;
@@ -36,11 +39,11 @@ public class LocationHelper {
         this.locationCallback = getLocationCallback();
     }
 
-    // 위치를 한 번만 업데이트
     public void fetchLocationOnce() {
         LocationRequest locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setNumUpdates(1); // 한 번만 업데이트 요청
+                .setInterval(LOCATION_UPDATE_INTERVAL_MS)
+                .setFastestInterval(LOCATION_UPDATE_FASTEST_INTERVAL_MS);
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -55,17 +58,21 @@ public class LocationHelper {
         return new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
+                if (locationResult == null || locationResult.getLocations().isEmpty()) {
+                    Log.e(TAG, "No location result available.");
                     return;
                 }
-                for (Location location : locationResult.getLocations()) {
-                    if (location != null) {
-                        lastLocation = location; // 마지막 위치 업데이트
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        Log.v(TAG, "LOCATION_UPDATE: " + latitude + ", " + longitude);
-                        sendLocationToServer(latitude, longitude);
-                    }
+
+                Location location = locationResult.getLocations().get(0);
+                if (location != null) {
+                    lastLocation = location; // 마지막 위치 업데이트
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+                    Log.v(TAG, "LOCATION_UPDATE: " + latitude + ", " + longitude);
+                    sendLocationToServer(latitude, longitude);
+
+                    // 위치 정보를 받은 후, 위치 업데이트를 중지합니다.
+                    fusedLocationProviderClient.removeLocationUpdates(this);
                 }
             }
         };
@@ -102,23 +109,21 @@ public class LocationHelper {
         });
     }
 
-    // 마지막으로 저장된 위치의 위도 반환
     public double getLatitude() {
         if (lastLocation != null) {
             return lastLocation.getLatitude();
         } else {
             Log.e(TAG, "No last known location available.");
-            return 0.0; // 위치를 사용할 수 없는 경우에 대한 기본값
+            return 0.0;
         }
     }
 
-    // 마지막으로 저장된 위치의 경도 반환
     public double getLongitude() {
         if (lastLocation != null) {
             return lastLocation.getLongitude();
         } else {
             Log.e(TAG, "No last known location available.");
-            return 0.0; // 위치를 사용할 수 없는 경우에 대한 기본값
+            return 0.0;
         }
     }
 }
