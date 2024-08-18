@@ -45,7 +45,7 @@ public class ScheduleItem {
 
         // scheduleView 내에서 additionalBox를 찾음
         LinearLayout additionalBox = scheduleView.findViewById(R.id.additionalBox);
-        Button takingButton = scheduleView.findViewById(R.id.TakingButtonAct);
+        TextView takingButton = scheduleView.findViewById(R.id.TakingButtonAct);
 
         List<Long> medicineIds = new ArrayList<>();
 
@@ -163,13 +163,13 @@ public class ScheduleItem {
             medicineImage.setImageDrawable(context.getResources().getDrawable(R.drawable.medicine));
             medicineImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
             medicineImage.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
-            medicineImage.getLayoutParams().height = 700;
+            medicineImage.getLayoutParams().height = 500;
 
         } else {
             ViewGroup.LayoutParams params = medicineImage.getLayoutParams();
             medicineImage.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            medicineImage.getLayoutParams().height = 700;
+            medicineImage.getLayoutParams().height = 500;
 
             medicineImage.setLayoutParams(params);
             String imageUrl = imageApiUrlPrefix + medicine.getMedicineImageName();
@@ -189,35 +189,30 @@ public class ScheduleItem {
      * @param takingButton Button
      * @param medicine     ScheduleResponse.Schedule.Medicine
      */
-    private static void setTakingMeicineButtonAttributes(Context context, Button takingButton, ScheduleResponse.Schedule.Medicine medicine) {
+    private static void setTakingMeicineButtonAttributes(Context context, TextView takingButton, ScheduleResponse.Schedule.Medicine medicine) {
 
         if (medicine.isStatus().equals("WAITING")) {
             takingButton.setText("약을 드셨다면 여기를 눌러주세요");
-            takingButton.setBackgroundColor(context.getResources().getColor(R.color.Info));
-            takingButton.setTextColor(context.getResources().getColor(R.color.White));
+            takingButton.setBackgroundResource(R.drawable.schedule_button_blue);
         } else if (medicine.isStatus().equals("NOT_TIME")) {
             takingButton.setText("아직 약을 드실 시간이 아니에요");
-            takingButton.setBackgroundColor(context.getResources().getColor(R.color.Gray45));
-            takingButton.setTextColor(context.getResources().getColor(R.color.White));
+            takingButton.setBackgroundResource(R.drawable.schedule_button_gray);
             takingButton.setEnabled(false);
         } else if (medicine.isStatus().equals("NO_TAKEN")) {
             takingButton.setText("약을 안 드셨어요");
-            takingButton.setTextColor(context.getResources().getColor(R.color.White));
-            takingButton.setBackgroundColor(context.getResources().getColor(R.color.ImportantError));
+            takingButton.setBackgroundResource(R.drawable.schedule_button_red);
             takingButton.setEnabled(false);
         } else if (medicine.isStatus().equals("PASS")) {
             takingButton.setText("약이 최근에 추가 되었어요");
-            takingButton.setTextColor(context.getResources().getColor(R.color.White));
-            takingButton.setBackgroundColor(context.getResources().getColor(R.color.SecondaryColorLight));
+            takingButton.setBackgroundResource(R.drawable.schedule_button_gray);
             takingButton.setEnabled(false);
         } else {
             takingButton.setText("약을 드셨어요!");
-            takingButton.setTextColor(context.getResources().getColor(R.color.White));
-            takingButton.setBackgroundColor(context.getResources().getColor(R.color.Success));
+            takingButton.setBackgroundResource(R.drawable.schedule_button_green);
 
         }
     }
-    private static void setTakingHospitalButtonAttributes(Context context, Button takingButton, Boolean status) {
+    private static void setTakingHospitalButtonAttributes(Context context, TextView takingButton, Boolean status) {
         if (status) {
             takingButton.setText("병원을 방문하셨어요!");
             takingButton.setBackgroundColor(context.getResources().getColor(R.color.Gray45));

@@ -1,12 +1,17 @@
 package com.example.mansumugang;
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -55,7 +60,14 @@ public class WeekCalendarAdapter extends RecyclerView.Adapter<WeekCalendarAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.dayTextView.setText(dayFormat.format(weekDates[position]));
         holder.dateTextView.setText(dateFormat.format(weekDates[position]));
-        holder.itemView.setBackgroundColor(selectedPosition == position ? Color.parseColor("#8582FF") : Color.TRANSPARENT);
+
+        if (selectedPosition == position) {
+            holder.dateTextView.setBackgroundResource(R.drawable.week_calender_rounded_corner_active);
+            holder.dateTextView.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.White));
+        }else{
+            holder.dateTextView.setBackgroundResource(R.drawable.week_calender_rounded_corner);
+            holder.dateTextView.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.Black));
+        }
 
         ViewGroup.LayoutParams layoutParams = holder.itemView.getLayoutParams();
         layoutParams.width = holder.itemView.getContext().getResources().getDisplayMetrics().widthPixels / 7;
@@ -87,8 +99,8 @@ public class WeekCalendarAdapter extends RecyclerView.Adapter<WeekCalendarAdapte
 
         ViewHolder(View itemView) {
             super(itemView);
-            dayTextView = itemView.findViewById(R.id.dayTextView);
             dateTextView = itemView.findViewById(R.id.dateTextView);
+            dayTextView = itemView.findViewById(R.id.dayTextView);
         }
     }
 }
