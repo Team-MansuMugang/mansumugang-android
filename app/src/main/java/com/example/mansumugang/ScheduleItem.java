@@ -1,6 +1,8 @@
 package com.example.mansumugang;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,9 +94,8 @@ public class ScheduleItem {
         TextView medicineNameView = medicineView.findViewById(R.id.medicineName);
         TextView hospitalNameView = medicineView.findViewById(R.id.hospitalName);
         TextView descriptionView = medicineView.findViewById(R.id.description);
-        TextView hodpitalLocationView = medicineView.findViewById(R.id.hodpitalLocation);
+        TextView hospitalLocationView = medicineView.findViewById(R.id.hodpitalLocation);
         ImageView hospitalImage = medicineView.findViewById(R.id.medicineImage);
-
 
         hospitalImage.setImageDrawable(context.getResources().getDrawable(R.drawable.hospital));
         hospitalImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -102,9 +103,18 @@ public class ScheduleItem {
         hospitalImage.getLayoutParams().height = 700;
         medicineNameView.setText(hospital.getHospitalName());
         hospitalNameView.setVisibility(View.GONE);
-        hodpitalLocationView.setVisibility(View.VISIBLE);
-        hodpitalLocationView.setText(hospital.getHospitalAddress());
+        hospitalLocationView.setVisibility(View.VISIBLE);
+        hospitalLocationView.setText(hospital.getHospitalAddress());
         descriptionView.setText(hospital.getHospitalDescription());
+
+        hospitalLocationView.setOnClickListener(v -> {
+            double latitude = hospital.getLatitude();
+            double longitude = hospital.getLongitude();
+            String uri = String.format("geo:%f,%f?q=%f,%f(%s)", latitude, longitude, latitude, longitude, hospital.getHospitalName());
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            intent.setPackage("com.google.android.apps.maps");
+            context.startActivity(intent);
+        });
 
         return medicineView;
 
