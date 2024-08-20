@@ -246,8 +246,8 @@ public class RecordActivity extends AppCompatActivity {
                 // 성공적으로 변환된 파일을 사용할 수 있습니다.
                 String token = App.prefs.getToken();
                 System.out.println("Conversion successful: " + convertedFile.getAbsolutePath());
-                uploadFileWithRetry(token,convertedFile);
-
+                audioFile.delete();
+                uploadFile(token,convertedFile);
             }
 
             @Override
@@ -260,7 +260,7 @@ public class RecordActivity extends AppCompatActivity {
     }
 
 
-    private void uploadFileWithRetry(String token, File audioFile) {
+    private void uploadFile(String token, File audioFile) {
         if (audioFile != null && audioFile.exists()) {
             RequestBody requestFile = RequestBody.create(audioFile, MediaType.parse("audio/mp3"));
             MultipartBody.Part body = MultipartBody.Part.createFormData("audio", audioFile.getName(), requestFile);
