@@ -5,9 +5,11 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -21,7 +23,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,10 +44,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
     private WeekCalendarAdapter weekCalendarAdapter;
     private LinearLayout layoutBox;
     private ScrollView scrollView;
-    private String hospitalName;
     private static final int REQUEST_PERMISSIONS = 1;
-
-    private AlarmLocationScheduler alarmLocationScheduler;
 
 
     @Override
@@ -71,8 +72,6 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
         // alarmLocationScheduler 초기화
 
 
-
-
         // 토큰 확인
         String token = App.prefs.getToken();
         if (token == null || token.isEmpty()) {
@@ -86,6 +85,13 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
             String todayDate = getTodayDate(); // 현재 날짜를 가져옴
             AlarmLocationScheduler scheduler = new AlarmLocationScheduler(this);
             scheduler.startScheduling(todayDate);
+            Intent serviceIntent = new Intent(this, LocationService.class);
+            serviceIntent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent);
+            } else {
+                startService(serviceIntent);
+            }
 
             fetchScheduleData(todayDate);
         }
@@ -182,14 +188,13 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
 
     }
 
-    public void handleTakingButtonClick(Long hospitalId , String date){
+    public void handleTakingButtonClick(Long hospitalId, String date) {
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         String token = App.prefs.getToken();
         IntakeRequest intakeRequest = new IntakeRequest(hospitalId);
 
 
-
-        Call call = apiService.inTake("Bearer " + token, intakeRequest );
+        Call call = apiService.inTake("Bearer " + token, intakeRequest);
 
         call.enqueue(new Callback() {
             @Override
@@ -216,7 +221,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
         });
     }
 
-    public void handleTakingButtonClick(List<Long> medicineIds , String medicineIntakeTime ,String date) {
+    public void handleTakingButtonClick(List<Long> medicineIds, String medicineIntakeTime, String date) {
 
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
 
@@ -226,7 +231,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
         System.out.println(date);
         String token = App.prefs.getToken();
 
-        Call<IntakeResponse> call = apiService.inTake("Bearer " + token, intakeRequest );
+        Call<IntakeResponse> call = apiService.inTake("Bearer " + token, intakeRequest);
 
         call.enqueue(new Callback<IntakeResponse>() {
             @Override
@@ -259,28 +264,69 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
     }
 
     private void displaySchedule(ScheduleResponse scheduleResponse) {
-
         List<ScheduleResponse.Schedule> schedules = scheduleResponse.getMedicineSchedules();
         layoutBox.removeAllViews();
 
         if (schedules == null || schedules.isEmpty()) {
-            TextView emptyView = new TextView(this);
-            emptyView.setText("오늘의 일정이 없습니다.");
-            emptyView.setGravity(Gravity.CENTER);
-            emptyView.setTextSize(40);
-            layoutBox.addView(emptyView);
-            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) emptyView.getLayoutParams();
-            params.topMargin = (int) (300 * getResources().getDisplayMetrics().density); // 16dp
-            emptyView.setLayoutParams(params);
-
+            showEmptyScheduleMessage();
             return;
         }
 
-        for (ScheduleResponse.Schedule schedule : schedules) {
-            ScheduleItem.createScheduleView(this, layoutBox,  schedule, scheduleResponse.getImageApiUrlPrefix(),scheduleResponse.getDate() ,scrollView);
+        SimpleDateFormat todayDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String todayDate = todayDateFormat.format(new Date());
+
+        int firstUpcomingEventIndex = -1;
+
+        for (int i = 0; i < schedules.size(); i++) {
+            ScheduleResponse.Schedule schedule = schedules.get(i);
+
+            // Create and add the view for the schedule
+            ScheduleItem.createScheduleView(this, layoutBox, schedule, scheduleResponse.getImageApiUrlPrefix(), scheduleResponse.getDate());
+
+            // Determine if this is the first upcoming event
+            if (firstUpcomingEventIndex == -1 && !isPastTime(scheduleResponse.getDate(), schedule.getTime())) {
+                firstUpcomingEventIndex = i;
+            }
         }
 
-
+        // Scroll to the first upcoming event
+        if (firstUpcomingEventIndex != -1) {
+            scrollToSchedule(firstUpcomingEventIndex);
+        }
     }
 
+    private void showEmptyScheduleMessage() {
+        TextView emptyView = new TextView(this);
+        emptyView.setText("오늘의 일정이 없습니다.");
+        emptyView.setGravity(Gravity.CENTER);
+        emptyView.setTextSize(40);
+        layoutBox.addView(emptyView);
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) emptyView.getLayoutParams();
+        params.topMargin = (int) (300 * getResources().getDisplayMetrics().density); // Adjust margin if needed
+        emptyView.setLayoutParams(params);
+    }
+
+    private void scrollToSchedule(int index) {
+        scrollView.post(() -> {
+            View targetView = layoutBox.getChildAt(index);
+            if (targetView != null) {
+                scrollView.scrollTo(0, targetView.getTop());
+            }
+        });
+    }
+
+    private boolean isPastTime(String date, String time) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        String dateTimeString = date + " " + time;
+        try {
+            Date scheduleTime = sdf.parse(dateTimeString);
+            Calendar currentTime = Calendar.getInstance();
+            currentTime.add(Calendar.MINUTE, -1); // Consider adding a small margin
+            return scheduleTime != null && scheduleTime.before(currentTime.getTime());
+        } catch (ParseException e) {
+            Log.e(TAG, "Date parsing error: ", e);
+            return false;
+        }
+    }
 }
+

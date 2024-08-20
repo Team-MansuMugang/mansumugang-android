@@ -243,24 +243,26 @@ public class RecordActivity extends AppCompatActivity {
         converter.convert3gpToMp3(inputPath, outputPath, new AudioConverter.ConversionCallback() {
             @Override
             public void onSuccess(File convertedFile) {
-                // 변환 성공 시 파일을 서버에 업로드
+                // 성공적으로 변환된 파일을 사용할 수 있습니다.
                 String token = App.prefs.getToken();
-                audioFile.delete();
-                uploadFileWithRetry(token, convertedFile);
+                System.out.println("Conversion successful: " + convertedFile.getAbsolutePath());
+                uploadFileWithRetry(token,convertedFile);
+
             }
 
             @Override
             public void onFailure(Exception error) {
                 // 변환 실패 처리
-                Toast.makeText(RecordActivity.this, "Audio conversion failed", Toast.LENGTH_SHORT).show();
+                System.err.println("Conversion failed: " + error.getMessage());
             }
         });
+
     }
 
 
     private void uploadFileWithRetry(String token, File audioFile) {
         if (audioFile != null && audioFile.exists()) {
-            RequestBody requestFile = RequestBody.create(audioFile, MediaType.parse("audio/3gp"));
+            RequestBody requestFile = RequestBody.create(audioFile, MediaType.parse("audio/mp3"));
             MultipartBody.Part body = MultipartBody.Part.createFormData("audio", audioFile.getName(), requestFile);
 
             ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
@@ -271,14 +273,12 @@ public class RecordActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         Toast.makeText(RecordActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
                         if (audioFile.exists()){ audioFile.delete(); }
-                    } else {
-                        handleUploadFailure(call, token, audioFile);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<SaveResponse> call, Throwable t) {
-                    handleUploadFailure(call, token, audioFile);
+                    System.out.println(t);
                 }
             });
         } else {
@@ -286,9 +286,5 @@ public class RecordActivity extends AppCompatActivity {
         }
     }
 
-    private void handleUploadFailure(Call<SaveResponse> call, String token, File audioFile) {
-        // Retry logic here
-        Toast.makeText(this, "Upload failed, retrying...", Toast.LENGTH_SHORT).show();
-        uploadFileWithRetry(token, audioFile);
-    }
+
 }

@@ -1,53 +1,35 @@
 package com.example.mansumugang;
 
-import android.os.AsyncTask;
+import com.arthenica.mobileffmpeg.FFmpeg;
+
 import java.io.File;
 
 public class AudioConverter {
 
+    // 인터페이스를 정의하여 콜백 방식으로 변환 결과를 전달
     public interface ConversionCallback {
         void onSuccess(File convertedFile);
         void onFailure(Exception error);
     }
 
     public void convert3gpToMp3(String inputPath, String outputPath, ConversionCallback callback) {
-        new ConvertTask(inputPath, outputPath, callback).execute();
-    }
+        // FFmpeg 명령어 정의
+        String command = String.format("-i \"%s\" -vn -acodec libmp3lame -ab 64k \"%s\"", inputPath, outputPath);
 
-    private static class ConvertTask extends AsyncTask<Void, Void, File> {
-        private String inputPath;
-        private String outputPath;
-        private ConversionCallback callback;
-        private Exception conversionError;
-
-        ConvertTask(String inputPath, String outputPath, ConversionCallback callback) {
-            this.inputPath = inputPath;
-            this.outputPath = outputPath;
-            this.callback = callback;
-        }
-
-        @Override
-        protected File doInBackground(Void... voids) {
-            try {
-                // 여기에 3GP에서 MP3로 변환하는 실제 코드를 작성합니다.
-                // 예를 들어, FFmpeg 라이브러리를 사용할 수 있습니다.
-                // 변환 작업 후 MP3 파일 반환
-                File convertedFile = new File(outputPath);
-                // 변환 성공 시 convertedFile을 반환
-                return convertedFile;
-            } catch (Exception e) {
-                conversionError = e;
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(File result) {
-            if (result != null) {
-                callback.onSuccess(result);
+        // FFmpeg 비동기 실행
+        FFmpeg.executeAsync(command, (executionId, returnCode) -> {
+            if (returnCode == 0) {
+                // 변환 성공
+                File converted = new File(outputPath);
+                if (converted.exists()) {
+                    callback.onSuccess(converted);
+                } else {
+                    callback.onFailure(new Exception("File conversion failed: File not found after conversion."));
+                }
             } else {
-                callback.onFailure(conversionError);
+                // 변환 실패
+                callback.onFailure(new Exception("Conversion failed with return code: " + returnCode));
             }
-        }
+        });
     }
 }

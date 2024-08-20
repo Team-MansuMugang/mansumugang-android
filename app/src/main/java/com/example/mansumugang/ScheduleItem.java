@@ -30,10 +30,8 @@ public class ScheduleItem {
      * @param imageApiUrlPrefix String
      * @return View
      */
-    public static View createScheduleView(Context context, LinearLayout layoutBox, ScheduleResponse.Schedule schedule, String imageApiUrlPrefix, String date, ScrollView scrollView) {
-        final int[] beforeIndex = {0};
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        Date currentTime = new Date();
+    public static View createScheduleView(Context context, LinearLayout layoutBox, ScheduleResponse.Schedule schedule, String imageApiUrlPrefix, String date) {
+
         String scheduleTimeStr = schedule.getTime();
 
         View scheduleView = LayoutInflater.from(context).inflate(R.layout.schedule_item, layoutBox, false);
@@ -82,32 +80,6 @@ public class ScheduleItem {
             });
         }
 
-        try {
-            Date scheduleTime = timeFormat.parse(scheduleTimeStr);
-            if (scheduleTime.before(currentTime)) {
-                beforeIndex[0] += 1; // 스케줄 시간이 현재 시간보다 이전이면 beforeIndex 증가
-            }
-
-            // 특정 조건을 만족하는 경우 additionalBox로 스크롤
-            scrollView.post(new Runnable() {
-                @Override
-                public void run() {
-                    // ScrollView의 LinearLayout의 위치로 스크롤 이동
-                    int childIndex = layoutBox.indexOfChild(scheduleView);
-                    if (childIndex != -1) {
-                        try {
-                            View childView = layoutBox.getChildAt(beforeIndex[0]);
-                            scrollView.scrollTo(0, childView.getTop());
-                        } catch (Exception e) {
-
-                        }
-                    }
-                }
-            });
-            return scheduleView;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
 
         return scheduleView;
     }
