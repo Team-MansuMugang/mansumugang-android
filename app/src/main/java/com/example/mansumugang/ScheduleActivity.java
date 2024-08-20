@@ -176,7 +176,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
                 if (response.isSuccessful()) {
                     displaySchedule(response.body());
                 } else {
-                    Log.e(TAG, "Response unsuccessful or empty: " + response.message());
+                    Log.e(TAG, "Response unsuccessful or empty: " + response.body());
                 }
             }
 
