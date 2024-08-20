@@ -187,12 +187,11 @@ public class ScheduleItem {
     private static void setTakingHospitalButtonAttributes(Context context, TextView takingButton, Boolean status) {
         if (status) {
             takingButton.setText("병원을 방문하셨어요!");
-            takingButton.setBackgroundColor(context.getResources().getColor(R.color.Gray45));
-            takingButton.setTextColor(context.getResources().getColor(R.color.White));
+            takingButton.setBackgroundResource(R.drawable.schedule_button_gray);
         } else {
             takingButton.setText("병원에 방문하셨다면 여기를 눌러주세요");
-            takingButton.setBackgroundColor(context.getResources().getColor(R.color.Info));
-            takingButton.setTextColor(context.getResources().getColor(R.color.White));
+            takingButton.setBackgroundResource(R.drawable.schedule_button_blue);
+
         }
     }
 }
