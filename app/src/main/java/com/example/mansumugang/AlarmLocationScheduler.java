@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -26,7 +27,7 @@ public class AlarmLocationScheduler {
     private Context context; // 컨텍스트 객체
     private LocationHelper locationHelper; // 위치를 가져오는 도우미 객체
 
-    private static final long REFRESH_INTERVAL = 20000L; // 알람 반복 간격, 20초
+    private static final long REFRESH_INTERVAL = 60000L; // 알람 반복 간격, 60초
     private static final int ALARM_REQUEST_CODE = 0; // 알람 요청 코드
 
     public AlarmLocationScheduler(Context context) {
@@ -49,26 +50,31 @@ public class AlarmLocationScheduler {
         long triggerTime = SystemClock.elapsedRealtime();
 
         if (alarmManager != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
-                try {
-                    alarmManager.setRepeating(
-                            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                            triggerTime,
-                            REFRESH_INTERVAL,
-                            pendingIntent
-                    );
-                } catch (SecurityException e) {
-                    Log.e(TAG, "Permission denied for scheduling exact alarms: " + e.getMessage());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (alarmManager.canScheduleExactAlarms()) {
+                    try {
+                        alarmManager.setRepeating(
+                                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                triggerTime,
+                                REFRESH_INTERVAL,
+                                pendingIntent
+                        );
+                    } catch (SecurityException e) {
+                        Log.e(TAG, "Permission denied for scheduling exact alarms: " + e.getMessage());
+                    }
+                } else {
+                    Log.e(TAG, "Cannot schedule exact alarms, permission not granted.");
+                    // 권한을 요청하기 위한 안내 또는 처리
+                    Intent exactAlarmIntent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                    context.startActivity(exactAlarmIntent);
                 }
-            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            } else {
                 alarmManager.setRepeating(
                         AlarmManager.ELAPSED_REALTIME_WAKEUP,
                         triggerTime,
                         REFRESH_INTERVAL,
                         pendingIntent
                 );
-            } else {
-                Log.e(TAG, "Cannot schedule exact alarms, permission not granted.");
             }
         }
     }
@@ -87,6 +93,7 @@ public class AlarmLocationScheduler {
 
     public void fetchLocationAndSchedule(String date) {
         // 위치 정보를 한 번만 가져옵니다
+
         locationHelper.fetchLocationOnce();
 
         new android.os.Handler().postDelayed(() -> {
@@ -155,10 +162,9 @@ public class AlarmLocationScheduler {
                 Calendar oneHourAfter = (Calendar) scheduleTime.clone();
                 oneHourAfter.add(Calendar.HOUR_OF_DAY, 1);
 
-                Log.d(TAG, "Is oneHourAfter before currentTime? " + oneHourAfter.before(currentTime));
-                Log.d(TAG, "Is one hour before After currentTime ? " + oneHourBefore.after(currentTime));
 
-                if (!currentTime.before(oneHourBefore) && !currentTime.after(oneHourAfter)) {
+
+                if (currentTime.before(oneHourBefore) && !currentTime.after(oneHourAfter)) {
                     double latitude = schedule.getHospital().getLatitude();
                     double longitude = schedule.getHospital().getLongitude();
                     Log.d(TAG, "Hospital location - Lat: " + latitude + ", Lon: " + longitude);
@@ -241,7 +247,6 @@ public class AlarmLocationScheduler {
 
             Calendar currentTime = Calendar.getInstance();
             currentTime.add(Calendar.MINUTE, -1);
-
             return scheduleTime.before(currentTime);
         } catch (ParseException e) {
             e.printStackTrace();

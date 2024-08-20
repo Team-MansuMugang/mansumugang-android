@@ -31,30 +31,35 @@ public class LocationHelper {
     private Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationCallback locationCallback;
-    private Location lastLocation; // 마지막 위치를 저장할 변수 추가
+    private Location lastLocation; // 마지막 위치를 저장할 변수
 
     public LocationHelper(Context context) {
         this.context = context;
         this.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
-        this.locationCallback = getLocationCallback();
+        this.locationCallback = createLocationCallback();
     }
 
     public void fetchLocationOnce() {
         LocationRequest locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(LOCATION_UPDATE_INTERVAL_MS)
-                .setFastestInterval(LOCATION_UPDATE_FASTEST_INTERVAL_MS);
+                .setFastestInterval(LOCATION_UPDATE_FASTEST_INTERVAL_MS)
+                .setNumUpdates(1); // 위치 업데이트를 한 번만 받도록 설정
 
+        // 위치 권한이 있는지 확인
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // 권한이 없는 경우, 권한 요청 또는 사용자에게 알림
+            Log.e(TAG, "Location permissions are not granted.");
             return;
         }
 
+        // 위치 업데이트 요청
+        Log.d(TAG, "Requesting location updates");
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
     }
 
-    private LocationCallback getLocationCallback() {
+    private LocationCallback createLocationCallback() {
         return new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -63,6 +68,7 @@ public class LocationHelper {
                     return;
                 }
 
+                // 최신 위치를 가져옵니다
                 Location location = locationResult.getLocations().get(0);
                 if (location != null) {
                     lastLocation = location; // 마지막 위치 업데이트
@@ -72,7 +78,7 @@ public class LocationHelper {
                     sendLocationToServer(latitude, longitude);
 
                     // 위치 정보를 받은 후, 위치 업데이트를 중지합니다.
-                    fusedLocationProviderClient.removeLocationUpdates(this);
+                    stopLocationUpdates();
                 }
             }
         };
@@ -124,6 +130,13 @@ public class LocationHelper {
         } else {
             Log.e(TAG, "No last known location available.");
             return 0.0;
+        }
+    }
+
+    public void stopLocationUpdates() {
+        if (fusedLocationProviderClient != null && locationCallback != null) {
+            fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+            Log.d(TAG, "Location updates stopped.");
         }
     }
 }

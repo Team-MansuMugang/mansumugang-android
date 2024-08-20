@@ -48,7 +48,8 @@ public class LocationService extends Service {
 
         startForeground(1, notification);
 
-        locationHelper.fetchLocationOnce(); // 위치 업데이트 시작
+        // Start fetching location
+        startLocationUpdates();
     }
 
     @Override
@@ -61,12 +62,20 @@ public class LocationService extends Service {
                 }
             }
         }
-        return START_STICKY; // 서비스가 종료되면 다시 시작됨
+        return START_STICKY; // Service is restarted if it is terminated
+    }
+
+    private void startLocationUpdates() {
+        if (locationHelper != null) {
+            locationHelper.fetchLocationOnce(); // Request location update
+        }
     }
 
     private void stopLocationService() {
-        locationHelper = null; // 위치 업데이트 중지
-        stopForeground(true); // Foreground 상태에서 종료
-        stopSelf(); // 서비스 종료
+        if (locationHelper != null) {
+            locationHelper.stopLocationUpdates(); // Stop location updates
+        }
+        stopForeground(true); // Remove the notification
+        stopSelf(); // Stop the service
     }
 }
