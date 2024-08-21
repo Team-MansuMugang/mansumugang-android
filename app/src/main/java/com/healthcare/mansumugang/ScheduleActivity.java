@@ -180,7 +180,6 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
         String token = App.prefs.getToken();
         IntakeRequest intakeRequest = new IntakeRequest(hospitalId);
 
-
         Call call = apiService.inTake("Bearer " + token, intakeRequest);
 
         call.enqueue(new Callback() {
@@ -259,8 +258,6 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
             return;
         }
 
-        SimpleDateFormat todayDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        String todayDate = todayDateFormat.format(new Date());
 
         int firstUpcomingEventIndex = -1;
 

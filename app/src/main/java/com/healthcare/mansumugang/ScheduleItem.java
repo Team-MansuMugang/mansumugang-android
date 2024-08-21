@@ -3,6 +3,7 @@ package com.healthcare.mansumugang;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
 
 public class ScheduleItem {
 
@@ -47,7 +54,9 @@ public class ScheduleItem {
             // 병원 정보가 있는 경우, 병원 뷰를 생성하여 추가
             View hospitalView = createHospitalView(context, schedule.getHospital());
             additionalBox.addView(hospitalView);
-            setTakingHospitalButtonAttributes(context, takingButton, schedule.getHospital().isHospitalStatus());
+            boolean pastTime = isPastTime(date, scheduleTimeStr);
+
+            setTakingHospitalButtonAttributes(pastTime, takingButton, schedule.getHospital().isHospitalStatus());
             // TakingButton 클릭 리스너 설정
             takingButton.setOnClickListener(v -> {
                 if (context instanceof ScheduleActivity) {
@@ -188,14 +197,32 @@ public class ScheduleItem {
 
         }
     }
-    private static void setTakingHospitalButtonAttributes(Context context, TextView takingButton, Boolean status) {
+    private static void setTakingHospitalButtonAttributes(Boolean isPastTime, TextView takingButton, Boolean status) {
         if (status) {
             takingButton.setText("병원을 방문하셨어요!");
             takingButton.setBackgroundResource(R.drawable.schedule_button_gray);
-        } else {
+        } else if (isPastTime){
+            takingButton.setText("병원에 방문예정이 있습니다");
+            takingButton.setBackgroundResource(R.drawable.schedule_button_gray);
+            takingButton.setEnabled(false);
+        } else
+        {
             takingButton.setText("병원에 방문하셨다면 여기를 눌러주세요");
             takingButton.setBackgroundResource(R.drawable.schedule_button_blue);
 
+        }
+    }
+
+    private static boolean isPastTime(String date, String time) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        String dateTimeString = date + " " + time;
+        try {
+            Date scheduleTime = sdf.parse(dateTimeString);
+            Calendar currentTime = Calendar.getInstance();
+            currentTime.add(Calendar.MINUTE, -1); // Consider adding a small margin
+            return scheduleTime != null && scheduleTime.before(currentTime.getTime());
+        } catch (ParseException e) {
+            return false;
         }
     }
 }
