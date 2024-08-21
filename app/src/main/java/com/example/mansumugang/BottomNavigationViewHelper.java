@@ -39,7 +39,11 @@ public class BottomNavigationViewHelper {
                 } else if (id == R.id.settings) {
                     intent = new Intent(activity, SettingsActivity.class);
 
+                } else if (id == R.id.camera) {
+                    intent = new Intent(activity, CameraActivity.class);
+
                 }
+
                 if (intent != null) {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     activity.startActivity(intent);
