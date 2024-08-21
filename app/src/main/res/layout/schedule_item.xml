@@ -9,16 +9,15 @@
 
     <TextView
         android:layout_marginTop="10dp"
-
         android:id="@+id/timeText"
+        android:textColor="@color/Black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="시간"
         android:paddingBottom="10dp"
-        android:drawableTop="@drawable/time"
         android:textStyle="bold"
-        android:textSize="30dp"/>
+        android:textSize="20dp"/>
 
     <LinearLayout
         android:id="@+id/additionalBox"
@@ -26,11 +25,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" />
 
-    <Button
+    <TextView
+        android:id="@+id/TakingButtonAct"
+        android:textColor="@color/White"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:background="@drawable/schedule_button_red"
         android:text="btn"
-        android:id="@+id/TakingButtonAct"
-        />
+        android:textSize="18dp"/>
 
 </LinearLayout>
