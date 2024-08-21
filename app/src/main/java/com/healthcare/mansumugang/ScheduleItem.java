@@ -3,7 +3,6 @@ package com.healthcare.mansumugang;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +53,7 @@ public class ScheduleItem {
             // 병원 정보가 있는 경우, 병원 뷰를 생성하여 추가
             View hospitalView = createHospitalView(context, schedule.getHospital());
             additionalBox.addView(hospitalView);
-            boolean pastTime = isPastTime(date, scheduleTimeStr);
+            boolean pastTime = inTimeRange(date, scheduleTimeStr);
 
             setTakingHospitalButtonAttributes(pastTime, takingButton, schedule.getHospital().isHospitalStatus());
             // TakingButton 클릭 리스너 설정
@@ -197,30 +196,40 @@ public class ScheduleItem {
 
         }
     }
-    private static void setTakingHospitalButtonAttributes(Boolean isPastTime, TextView takingButton, Boolean status) {
+    private static void setTakingHospitalButtonAttributes(Boolean inTimeRange, TextView takingButton, Boolean status) {
         if (status) {
             takingButton.setText("병원을 방문하셨어요!");
             takingButton.setBackgroundResource(R.drawable.schedule_button_gray);
-        } else if (isPastTime){
+        } else if (inTimeRange){
+            takingButton.setText("병원에 방문하셨다면 여기를 눌러주세요");
+            takingButton.setBackgroundResource(R.drawable.schedule_button_blue);
+        } else
+        {
             takingButton.setText("병원에 방문예정이 있습니다");
             takingButton.setBackgroundResource(R.drawable.schedule_button_gray);
             takingButton.setEnabled(false);
-        } else
-        {
-            takingButton.setText("병원에 방문하셨다면 여기를 눌러주세요");
-            takingButton.setBackgroundResource(R.drawable.schedule_button_blue);
 
         }
     }
 
-    private static boolean isPastTime(String date, String time) {
+    private static boolean inTimeRange(String date, String time) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         String dateTimeString = date + " " + time;
         try {
             Date scheduleTime = sdf.parse(dateTimeString);
+            Calendar scheduleCalendar = Calendar.getInstance();
+            scheduleCalendar.setTime(scheduleTime);
+
             Calendar currentTime = Calendar.getInstance();
-            currentTime.add(Calendar.MINUTE, -1); // Consider adding a small margin
-            return scheduleTime != null && scheduleTime.before(currentTime.getTime());
+            Calendar oneHourAfter = (Calendar) scheduleCalendar.clone();
+            oneHourAfter.add(Calendar.HOUR_OF_DAY, 1);
+            if (scheduleTime != null) {
+                oneHourAfter.setTime(scheduleTime);
+                oneHourAfter.add(Calendar.HOUR_OF_DAY, 1);
+
+            }
+
+            return currentTime.after(scheduleCalendar) && currentTime.before(oneHourAfter);
         } catch (ParseException e) {
             return false;
         }
