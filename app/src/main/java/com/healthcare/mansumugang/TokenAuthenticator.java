@@ -22,6 +22,7 @@ public class TokenAuthenticator implements Authenticator {
     private static final String TAG = "TokenAuthenticator";
     private Context context;
     private boolean isTokenRefreshing = false;
+    private AlarmLocationScheduler alarmLocationScheduler;
 
     /**
      * TokenAuthenticator 생성자
@@ -30,6 +31,7 @@ public class TokenAuthenticator implements Authenticator {
      */
     public TokenAuthenticator(Context context) {
         this.context = context;
+        this.alarmLocationScheduler = new AlarmLocationScheduler(context);
     }
 
     /**
@@ -98,35 +100,10 @@ public class TokenAuthenticator implements Authenticator {
                         if (errorBody.contains("NoSuchRefreshTokenError")) {
                             Log.e(TAG, "Refresh token is invalid. Logging out...");
 
-                            // 위치 서비스가 실행 중인지 확인하고 중지
-                            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                            boolean isServiceRunning = false;
-
-//                            수정필요 ++ 리프래쉬 토큰 상실일 경우 모든 토큰을 제거하지만 로케이션이 주기적으로 업데이트 됌, 즉 의도치 않은 로그아웃 시 실행중인 locationservice 중단 불가
-                            if (activityManager != null) {
-                                for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-                                    if (LocationService.class.getName().equals(service.service.getClassName())) {
-                                        isServiceRunning = true;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (isServiceRunning) {
-                                Intent stopLocationServiceIntent = new Intent(context, LocationService.class); // LocationService는 위치 업데이트를 제공하는 서비스로 가정
-                                context.stopService(stopLocationServiceIntent);
-                                Log.d(TAG, "Location service stopped.");
-                                // 로그아웃 수행
-                                LogoutUtil.performLogout(context);
-                            } else {
-                                Log.d(TAG, "Location service is not running.");
-                                // 로그아웃 수행
-                                LogoutUtil.performLogout(context);
-                                // 로그인 화면으로 이동
-                                Intent intent = new Intent(context, LoginActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                context.startActivity(intent);
-                            }
+                            LogoutUtil.performLogout(context, alarmLocationScheduler);
+                            Intent intent = new Intent(context, LoginActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            context.startActivity(intent);
                         }
                     }
                 }

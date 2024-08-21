@@ -82,14 +82,24 @@ public class AlarmLocationScheduler {
     public void stopScheduling() {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.setAction("FETCH_LOCATION_AND_SCHEDULE"); // 동일한 액션 설정
+        intent.putExtra("date", ""); // date 인자를 빈 문자열로 설정
+
+        // 알람 설정 시와 동일한 PendingIntent 생성
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
+        System.out.println("stop scheduling");
+
         if (alarmManager != null) {
             alarmManager.cancel(pendingIntent);
+            System.out.println("AlarmManager cancelled successfully");
+        } else {
+            System.out.println("AlarmManager is null, cannot cancel alarm");
         }
     }
+
 
     public void fetchLocationAndSchedule(String date) {
         // 위치 정보를 한 번만 가져옵니다

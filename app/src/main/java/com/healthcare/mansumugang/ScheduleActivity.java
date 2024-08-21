@@ -148,20 +148,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
         fetchScheduleData(formattedDate);
     }
 
-    /**
-     * 위치 서비스가 실행 중인지 확인합니다.
-     *
-     * @return 위치 서비스가 실행 중이면 true, 그렇지 않으면 false
-     */
-    private boolean isLocationServiceRunning() {
-        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-            if (LocationService.class.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
+
 
 
     private void fetchScheduleData(String date) {
