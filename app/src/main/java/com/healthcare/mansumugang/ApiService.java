@@ -102,9 +102,20 @@ public interface ApiService {
     Call<SaveResponse> saveAudio(
             @Header("Authorization") String accessToken
             ,            @Part MultipartBody.Part audio
-
             );
 
 
+    /**
+     * 서버로 이미지파일의 저장을 요청합니다.
+     *
+     * @param accessToken 인증 토큰
+     * @return void
+     */
+    @Multipart
+    @POST("api/medicine/prescription")
+    Call<Void> saveImage(
+            @Header("Authorization") String accessToken
+            ,            @Part MultipartBody.Part image
+    );
 
 }

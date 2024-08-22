@@ -3,18 +3,50 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/camera_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_horizontal"
+        android:paddingBottom="10dp"
+        android:text="카메라"
+        android:textSize="30sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/camera_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/camera_title"
+
+        android:paddingBottom="10dp"
+        android:text="보호자에게 사진을 전송하세요"
+        android:textSize="20sp"
+        />
 
     <TextureView
         android:id="@+id/cameraTextureView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/camera_subtitle"
+        android:layout_above="@+id/linearLayout"
+
+        android:layout_margin="16dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"/>
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:gravity="center"
+
 
         android:orientation="vertical">
 
@@ -36,9 +68,6 @@
             app:itemIconTint="@color/selector_bottom_nav_item"
             app:itemTextColor="@color/selector_bottom_nav_item"
             app:labelVisibilityMode="labeled"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:menu="@menu/bottom_nav_menu" />
     </LinearLayout>
 

@@ -1,4 +1,4 @@
-package com.example.mansumugang;
+package com.healthcare.mansumugang;
 
 import android.os.Bundle;
 
@@ -42,7 +42,7 @@ public class CameraActivity extends AppCompatActivity {
 
         mCameraCaptureButton = (Button) findViewById(R.id.capture);
 
-        mCameraTextureView = (TextureView) findViewById(R.id.cameraTextureView);
+        mCameraTextureView = findViewById(R.id.cameraTextureView);
         mPreview = new Preview(this, mCameraTextureView, mCameraCaptureButton);
 
     }
@@ -74,12 +74,12 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mPreview.onResume();
+//        mPreview.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mPreview.onPause();
+//        mPreview.onPause();
     }
 }

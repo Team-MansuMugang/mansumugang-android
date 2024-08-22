@@ -9,7 +9,11 @@
         android:enabled="true"
         android:icon="@drawable/recording"
         android:title="녹음"/>
-
+    <item
+        android:id="@+id/camera"
+        android:enabled="true"
+        android:icon="@drawable/camera"
+        android:title="카메라"/>
     <item
         android:id="@+id/guideline"
         android:enabled="true"
@@ -20,9 +24,4 @@
         android:enabled="true"
         android:icon="@drawable/settings"
         android:title="설정"/>
-    <item
-        android:id="@+id/camera"
-        android:enabled="true"
-        android:icon="@drawable/settings"
-        android:title="카메라"/>
 </menu>
