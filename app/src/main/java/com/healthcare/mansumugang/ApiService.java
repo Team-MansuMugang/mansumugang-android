@@ -118,4 +118,14 @@ public interface ApiService {
             ,            @Part MultipartBody.Part image
     );
 
+
+    /**
+     * 서버로 일정 요청을 보냅니다.
+     *
+     * @param accessToken 인증 토큰
+     * @return 서버로부터의 응답을 포함하는 Call 객체
+     */
+    @GET("api/user/inquiry/familyMember")
+    Call<FamilyMemberResponse> getFamilyMember(
+            @Header("Authorization") String accessToken);
 }
