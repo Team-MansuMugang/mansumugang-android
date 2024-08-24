@@ -1,18 +1,24 @@
 package com.healthcare.mansumugang;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import android.Manifest;
 
 import com.google.gson.JsonObject;
 
@@ -24,38 +30,29 @@ import retrofit2.Response;
 
 import java.io.IOException;
 
-/**
- * LoginActivity 클래스는 로그인 화면을 관리하고 로그인 기능을 수행합니다.
- */
 public class LoginActivity extends AppCompatActivity {
 
-    // 뷰 요소들을 정의합니다.
     private EditText loginIdEditText;
     private EditText loginPasswordEditText;
     private Button loginButton;
     private static final String TAG = "LoginActivity";
-    private static final int REQUEST_PERMISSION_FINE_LOCATION = 1001;
-    private static final int REQUEST_PERMISSION_COARSE_LOCATION = 1002;
-    private static final int REQUEST_PERMISSION_BACKGROUND_LOCATION = 1003;
-    private static final int REQUEST_PERMISSION_RECORD_AUDIO = 1004;
-    private static final int REQUEST_PERMISSION_POST_NOTIFICATIONS = 1005;
-    private static final int REQUEST_PERMISSION_READ_STORAGE = 1006;
-    private static final int REQUEST_PERMISSION_WRITE_STORAGE = 1007;
-    private static final int REQUEST_PERMISSION_CAMERA = 1008;
-    private static final int REQUEST_PERMISSION_SCHEDULE_EXACT_ALARM = 1009;
+    private PermissionSupport permission;
+
+    private static final int BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 1024;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // 뷰 요소들을 초기화합니다.
         loginIdEditText = findViewById(R.id.login_id);
         loginPasswordEditText = findViewById(R.id.login_password);
         loginButton = findViewById(R.id.login_button);
 
-//        checkAndRequestPermissions();
+        permission = new PermissionSupport(this, this);
 
-        // 로그인 버튼 클릭 리스너 설정
+        permissionCheck();
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,132 +61,111 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * 권한이 허용되었는지 확인하고 필요한 경우 요청합니다.
-     */
-    private void checkAndRequestPermissions() {
-        if (!hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_PERMISSION_FINE_LOCATION);
+    private void permissionCheck() {
+        // Check and request runtime permissions
+        if (!permission.checkPermission()) {
+            permission.requestAllPermissions();
         }
-        if (!hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    REQUEST_PERMISSION_COARSE_LOCATION);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-                !hasPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
-                    REQUEST_PERMISSION_BACKGROUND_LOCATION);
-        }
-        if (!hasPermission(Manifest.permission.RECORD_AUDIO)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.RECORD_AUDIO},
-                    REQUEST_PERMISSION_RECORD_AUDIO);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                !hasPermission(Manifest.permission.POST_NOTIFICATIONS)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                    REQUEST_PERMISSION_POST_NOTIFICATIONS);
-        }
-        if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    REQUEST_PERMISSION_READ_STORAGE);
-        }
-        if (!hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_PERMISSION_WRITE_STORAGE);
-        }
-        if (!hasPermission(Manifest.permission.CAMERA)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA},
-                    REQUEST_PERMISSION_CAMERA);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                !hasPermission(Manifest.permission.SCHEDULE_EXACT_ALARM)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.SCHEDULE_EXACT_ALARM},
-                    REQUEST_PERMISSION_SCHEDULE_EXACT_ALARM);
+
+        // Check and request background location permission if needed
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            checkAndRequestBackgroundLocationPermission();
         }
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    private void checkAndRequestBackgroundLocationPermission() {
+        boolean backgroundLocationGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+        if (!backgroundLocationGranted) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                showPermissionExplanationDialog();
+            } else {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
+                        BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
+                );
+            }
+        }
+    }
+
+    private void showPermissionExplanationDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("권한 요청")
+                .setMessage("앱이 백그라운드에서 위치 정보를 사용하기 위해 권한이 필요합니다. 권한을 허용해 주세요.")
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ActivityCompat.requestPermissions(
+                                LoginActivity.this,
+                                new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
+                                BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
+                        );
+                    }
+                })
+                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(), "권한이 필요합니다.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    private void openAppSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Background location permission granted
+                Toast.makeText(this, "백그라운드 위치 권한이 허용되었습니다.", Toast.LENGTH_SHORT).show();
+            } else {
+                // Background location permission denied
+                Toast.makeText(this, "백그라운드 위치 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show();
+                new AlertDialog.Builder(this)
+                        .setTitle("권한 필요")
+                        .setMessage("백그라운드 위치 권한이 필요합니다. 설정에서 권한을 허용해 주세요.")
+                        .setPositiveButton("설정으로 가기", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                openAppSettings();
+                            }
+                        })
+                        .setNegativeButton("취소", null)
+                        .create()
+                        .show();
+            }
+        } else {
+            // Handle other permission results
+            if (!permission.permissionResult(requestCode, permissions, grantResults)) {
+                Toast.makeText(this, "필요한 권한이 거부되었습니다. 권한을 허용해야 앱을 사용할 수 있습니다.", Toast.LENGTH_LONG).show();
+            }
+        }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        switch (requestCode) {
-            case REQUEST_PERMISSION_FINE_LOCATION:
-                // Handle the result for fine location permission
-                checkAndRequestPermissions(); // Continue with the next permission request
-                break;
-            case REQUEST_PERMISSION_COARSE_LOCATION:
-                // Handle the result for coarse location permission
-                checkAndRequestPermissions(); // Continue with the next permission request
-                break;
-            case REQUEST_PERMISSION_BACKGROUND_LOCATION:
-                // Handle the result for background location permission
-                checkAndRequestPermissions(); // Continue with the next permission request
-                break;
-            case REQUEST_PERMISSION_RECORD_AUDIO:
-                // Handle the result for record audio permission
-                checkAndRequestPermissions(); // Continue with the next permission request
-                break;
-            case REQUEST_PERMISSION_POST_NOTIFICATIONS:
-                // Handle the result for post notifications permission
-                checkAndRequestPermissions(); // Continue with the next permission request
-                break;
-            case REQUEST_PERMISSION_READ_STORAGE:
-                // Handle the result for read storage permission
-                checkAndRequestPermissions(); // Continue with the next permission request
-                break;
-            case REQUEST_PERMISSION_WRITE_STORAGE:
-                // Handle the result for write storage permission
-                checkAndRequestPermissions(); // Continue with the next permission request
-                break;
-            case REQUEST_PERMISSION_CAMERA:
-                // Handle the result for camera permission
-                checkAndRequestPermissions(); // Continue with the next permission request
-                break;
-            case REQUEST_PERMISSION_SCHEDULE_EXACT_ALARM:
-                // Handle the result for schedule exact alarm permission
-                // No further permissions to request
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-                break;
-        }
     }
 
-    private boolean hasPermission(String permission) {
-        return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
-    }
-
-
-    /**
-     * performLogin 메서드는 사용자가 입력한 아이디와 비밀번호로 로그인 요청을 수행합니다.
-     */
     private void performLogin() {
         String username = loginIdEditText.getText().toString();
         String password = loginPasswordEditText.getText().toString();
 
-        // 아이디와 비밀번호가 비어있는지 확인합니다.
         if (username.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "아이디와 비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // JSON 형식으로 변환하여 출력
         JsonObject jsonRequest = new JsonObject();
         jsonRequest.addProperty("username", username);
         jsonRequest.addProperty("password", password);
         String jsonString = jsonRequest.toString();
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonString);
 
-        // Retrofit을 사용하여 API 호출
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         Call<LoginResponse> call = apiService.login(requestBody);
 
@@ -197,42 +173,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful()) {
-                    // 성공적으로 응답을 받은 경우
                     LoginResponse loginResponse = response.body();
                     if (loginResponse != null) {
-                        if (loginResponse.getUserType().equals("USER_PROTECTOR"))
-                        {
-                            // USER_PROTECTOR인 경우
-                            loginIdEditText.setText("");
-                            loginPasswordEditText.setText("");
-                            Toast.makeText(LoginActivity.this, "환자 아이디로 로그인 하세요!", Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        String accessToken = loginResponse.getAccessToken();
-                        App.prefs.setToken(accessToken); // 액세스 토큰 저장
-
-                        String refreshToken = loginResponse.getRefreshToken();
-                        App.prefs.setRefreshToken(refreshToken); // 리프레시 토큰 저장
-
-                        String userType = loginResponse.getUserType();
-
-                        String savedToken = App.prefs.getToken();
-                        String RefreshToken = App.prefs.getRefreshToken();
-
-                        System.out.println("저장된 액세스 토큰: " + savedToken);
-                        System.out.println("저장된 ref 토큰: " + RefreshToken);
-                        // 스케줄 액티비티로 이동
-                        Intent intent = new Intent(LoginActivity.this, ScheduleActivity.class);
-                        startActivity(intent);
-                        overridePendingTransition(0, 0);
-                        finish(); // 현재 액티비티를 종료하여 백 스택에서 제거
+                        handleLoginResponse(loginResponse);
                     } else {
-                        String errorMessage = "로그인 실패: 응답 없음";
-                        Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                        Log.e(TAG, errorMessage + " - 로그인 실패");
+                        showError("로그인 실패: 응답 없음");
                     }
                 } else {
-                    // 응답이 실패한 경우
                     String errorMessage = "로그인 실패: " + response.message();
                     if (response.errorBody() != null) {
                         try {
@@ -241,18 +188,35 @@ public class LoginActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-                    Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                    Log.e(TAG, errorMessage + " - 로그인 실패");
+                    showError(errorMessage);
                 }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                // 요청이 실패한 경우
-                String errorMessage = "로그인 실패: " + t.getMessage();
-                Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                Log.e(TAG, errorMessage + " - 로그인 실패", t);
+                showError("로그인 실패: " + t.getMessage());
             }
         });
+    }
+
+    private void handleLoginResponse(LoginResponse loginResponse) {
+        if (loginResponse.getUserType().equals("USER_PROTECTOR")) {
+            loginIdEditText.setText("");
+            loginPasswordEditText.setText("");
+            Toast.makeText(this, "환자 아이디로 로그인 하세요!", Toast.LENGTH_LONG).show();
+        } else {
+            App.prefs.setToken(loginResponse.getAccessToken());
+            App.prefs.setRefreshToken(loginResponse.getRefreshToken());
+
+            Intent intent = new Intent(this, ScheduleActivity.class);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+            finish();
+        }
+    }
+
+    private void showError(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        Log.e(TAG, message);
     }
 }

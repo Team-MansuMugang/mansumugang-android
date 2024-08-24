@@ -76,6 +76,8 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
             scheduler.startScheduling(todayDate);
             Intent serviceIntent = new Intent(this, LocationService.class);
             serviceIntent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(serviceIntent);
             } else {
