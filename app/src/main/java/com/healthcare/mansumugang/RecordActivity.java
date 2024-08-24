@@ -263,7 +263,7 @@ public class RecordActivity extends AppCompatActivity {
                 // 성공적으로 변환된 파일을 사용할 수 있습니다.
                 String token = App.prefs.getToken();
                 System.out.println("Conversion successful: " + convertedFile.getAbsolutePath());
-//                audioFile.delete();
+                audioFile.delete();
                 uploadFile(token,convertedFile);
             }
 
@@ -289,7 +289,7 @@ public class RecordActivity extends AppCompatActivity {
                 public void onResponse(Call<SaveResponse> call, Response<SaveResponse> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(RecordActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
-//                        if (audioFile.exists()){ audioFile.delete(); }
+                        if (audioFile.exists()){ audioFile.delete(); }
                     }
                 }
 
