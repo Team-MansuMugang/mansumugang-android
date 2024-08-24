@@ -1,7 +1,6 @@
 package com.healthcare.mansumugang;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -11,8 +10,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import retrofit2.Call;
@@ -59,11 +58,11 @@ public class SettingsActivity extends AppCompatActivity {
             public void onResponse(Call<FamilyMemberResponse> call, Response<FamilyMemberResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     FamilyMemberResponse familyMemberResponse = response.body();
-                    addFamilyMemberToView(familyMemberResponse.getSelf(), "본인");
-                    addFamilyMemberToView(familyMemberResponse.getProtector(), "보호자");
+                    addFamilyMemberToView(familyMemberResponse.getSelf(), "본인" , familyMemberResponse.getImageApiUrl());
+                    addFamilyMemberToView(familyMemberResponse.getProtector(), "보호자",familyMemberResponse.getImageApiUrl());
 
                     for (FamilyMemberResponse.FamilyMember otherPatient : familyMemberResponse.getOtherPatients()) {
-                        addFamilyMemberToView(otherPatient, "환자");
+                        addFamilyMemberToView(otherPatient, "환자",familyMemberResponse.getImageApiUrl());
                     }
                 }
             }
@@ -76,7 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    private void addFamilyMemberToView(FamilyMemberResponse.FamilyMember member, String role) {
+    private void addFamilyMemberToView(FamilyMemberResponse.FamilyMember member, String role, String getImageApiUrl) {
         if (member == null) return;
 
         // LinearLayout 생성 (상위 컨테이너)
@@ -89,11 +88,25 @@ public class SettingsActivity extends AppCompatActivity {
         layout.setBackgroundResource(R.drawable.edit_round);
 
 // ImageView 생성
+        System.out.println(getImageApiUrl);
+        System.out.println(member.getProfileImageName());
         ImageView imageView = new ImageView(this);
         LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(dpToPx(60), dpToPx(60));
         imageParams.gravity = Gravity.CENTER_VERTICAL;
         imageView.setLayoutParams(imageParams);
-        imageView.setImageResource(R.drawable.person);
+
+        if (member.getProfileImageName() == null) {
+            imageView.setImageResource(R.drawable.person);
+
+        } else {
+
+            String imageUrl = getImageApiUrl +member.getProfileImageName();
+            Glide.with(this)
+                    .load(imageUrl)
+
+                    .into(imageView);
+        }
+
         imageView.setBackgroundResource(R.drawable.edit_round);
 
 // 첫 번째 수평 LinearLayout 생성 (nameTextView와 roleTextView를 위한 레이아웃)

@@ -3,9 +3,14 @@ package com.healthcare.mansumugang;
 import java.util.List;
 
 public class FamilyMemberResponse {
+    private String imageApiUrl;
     private FamilyMember self;
     private FamilyMember protector;
     private List<FamilyMember> otherPatients;
+
+    public String getImageApiUrl() {
+        return imageApiUrl;
+    }
 
     public FamilyMember getSelf() {
         return self;
@@ -35,6 +40,12 @@ public class FamilyMemberResponse {
         private String name;
         private String telephone;
         private String usertype;
+        private String profileImageName;
+
+        public String getProfileImageName() {
+            return profileImageName;
+        }
+
 
         public String getName() {
             return name;
