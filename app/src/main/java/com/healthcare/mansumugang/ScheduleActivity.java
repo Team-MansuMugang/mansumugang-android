@@ -1,10 +1,6 @@
 package com.healthcare.mansumugang;
-import android.Manifest;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,18 +9,14 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.text.SimpleDateFormat;
@@ -44,14 +36,11 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
     private WeekCalendarAdapter weekCalendarAdapter;
     private LinearLayout layoutBox;
     private ScrollView scrollView;
-    private static final int REQUEST_PERMISSIONS = 1;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
-        checkAndRequestPermissions();
         scrollView = findViewById(R.id.scrollViewBox);
         // RecyclerView 초기화
         weekRecyclerView = findViewById(R.id.weekRecyclerView);
@@ -99,41 +88,8 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
 
     }
 
-    /**
-     * 권한이 허용되었는지 확인하고 필요한 경우 요청합니다.
-     */
-    private void checkAndRequestPermissions() {
-        List<String> permissionsNeeded = new ArrayList<>();
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            permissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION); // allow all the time 으로는 사용자가 수정해야함
-        }
 
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            permissionsNeeded.add(Manifest.permission.RECORD_AUDIO);
-        }
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            permissionsNeeded.add(Manifest.permission.POST_NOTIFICATIONS);
-        }
-
-        if (!permissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(this, permissionsNeeded.toArray(new String[0]), REQUEST_PERMISSIONS);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_PERMISSIONS) {
-            for (int i = 0; i < permissions.length; i++) {
-                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "권한이 거부되었습니다: " + permissions[i], Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
 
     private String getTodayDate() {
         SimpleDateFormat today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
