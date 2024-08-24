@@ -157,6 +157,20 @@ public class RecordActivity extends AppCompatActivity {
             mediaRecorder.prepare();
             mediaRecorder.start();
             isRecording = true;
+            chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+                @Override
+                public void onChronometerTick(Chronometer chronometer) {
+                    long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
+
+                    // 20분(1200초)에 해당하는 시간을 체크하여 녹음 중지 및 변환
+                    if (elapsedMillis >= 20 * 60 * 1000) {  // 20분 = 20 * 60 * 1000 밀리초
+                        if (isRecording) {
+                            stopRecording();
+                            convertAudio();
+                        }
+                    }
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -173,7 +187,10 @@ public class RecordActivity extends AppCompatActivity {
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        mediaRecorder.setAudioEncodingBitRate(48000);
+        mediaRecorder.setAudioSamplingRate(48000);
+
 
         String filePath = createFilePath() + createFileName() + ".3gp";
         System.out.println(filePath);
@@ -246,7 +263,7 @@ public class RecordActivity extends AppCompatActivity {
                 // 성공적으로 변환된 파일을 사용할 수 있습니다.
                 String token = App.prefs.getToken();
                 System.out.println("Conversion successful: " + convertedFile.getAbsolutePath());
-                audioFile.delete();
+//                audioFile.delete();
                 uploadFile(token,convertedFile);
             }
 
@@ -272,7 +289,7 @@ public class RecordActivity extends AppCompatActivity {
                 public void onResponse(Call<SaveResponse> call, Response<SaveResponse> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(RecordActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
-                        if (audioFile.exists()){ audioFile.delete(); }
+//                        if (audioFile.exists()){ audioFile.delete(); }
                     }
                 }
 

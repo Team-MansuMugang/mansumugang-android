@@ -14,7 +14,7 @@ public class AudioConverter {
 
     public void convert3gpToMp3(String inputPath, String outputPath, ConversionCallback callback) {
         // FFmpeg 명령어 정의
-        String command = String.format("-i \"%s\" -vn -acodec libmp3lame -ab 64k \"%s\"", inputPath, outputPath);
+        String command = String.format("-i \"%s\" -vn -acodec libmp3lame \"%s\"", inputPath, outputPath);
 
         // FFmpeg 비동기 실행
         FFmpeg.executeAsync(command, (executionId, returnCode) -> {
