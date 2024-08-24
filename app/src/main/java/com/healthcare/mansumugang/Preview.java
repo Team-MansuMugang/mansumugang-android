@@ -284,6 +284,7 @@ public class Preview extends Thread {
                             @Override
                             public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
                                 Toast.makeText(mContext, "Picture taken!", Toast.LENGTH_SHORT).show();
+                                startPreview();
 
                                 if (imageFile != null && imageFile.exists()) {
                                     ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
@@ -297,6 +298,7 @@ public class Preview extends Thread {
                                         public void onResponse(Call<Void> call, Response<Void> response) {
                                             // 성공 응답 처리
                                             System.out.println("성공");
+                                            imageFile.delete();
                                         }
 
                                         @Override
