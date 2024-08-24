@@ -175,22 +175,16 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
         System.out.println(date);
         String token = App.prefs.getToken();
 
-        Call<IntakeResponse> call = apiService.inTake("Bearer " + token, intakeRequest);
+        Call<Void> call = apiService.inTake("Bearer " + token, intakeRequest);
 
-        call.enqueue(new Callback<IntakeResponse>() {
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<IntakeResponse> call, Response<IntakeResponse> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 System.out.println(response);
 
                 if (response.isSuccessful()) {
                     // 성공적으로 응답을 받았을 때 처리
-                    IntakeResponse intakeResponse = response.body();
-
-                    // 성공적일때 fetchdata해서 패치
-                    if (intakeResponse != null) {
-                        // 응답 처리
                         fetchScheduleData(date);
-                    }
                 } else {
                     // 실패 처리
                     Log.e("ScheduleActivity", "API 호출 실패: " + response.message());
@@ -198,7 +192,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
             }
 
             @Override
-            public void onFailure(Call<IntakeResponse> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 Log.e("ScheduleActivity", "API 호출 실패", t);
 
             }

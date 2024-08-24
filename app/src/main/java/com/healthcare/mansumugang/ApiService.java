@@ -60,7 +60,7 @@ public interface ApiService {
      */
     @Headers("Content-Type: application/json")
     @POST("api/auth/logout")
-    Call<LogoutResponse> logout(
+    Call<Void> logout(
             @Header("Authorization-refresh") String refreshToken);
 
 
@@ -84,7 +84,7 @@ public interface ApiService {
      * @return 서버로부터의 응답을 포함하는 Call 객체
      */
     @POST("api/medicine/intake/toggle")
-    Call<IntakeResponse> inTake(
+    Call<Void> inTake(
             @Header("Authorization") String accessToken
             , @Body IntakeRequest inTakeRequest);
 
@@ -99,7 +99,7 @@ public interface ApiService {
      */
     @Multipart
     @POST("api/record/save")
-    Call<SaveResponse> saveAudio(
+    Call<Void> saveAudio(
             @Header("Authorization") String accessToken
             ,            @Part MultipartBody.Part audio
             );

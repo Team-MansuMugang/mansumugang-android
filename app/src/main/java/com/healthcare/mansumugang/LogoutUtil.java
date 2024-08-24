@@ -24,7 +24,7 @@ public class LogoutUtil {
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         String refreshToken = App.prefs.getRefreshToken(); // 리프레시 토큰
 
-        Call<LogoutResponse> call = apiService.logout("Bearer " + refreshToken);
+        Call<Void> call = apiService.logout("Bearer " + refreshToken);
 
         // 저장된 토큰 및 사용자 정보 삭제
         App.prefs.setToken(null);
@@ -57,9 +57,9 @@ public class LogoutUtil {
         }
 
 
-        call.enqueue(new Callback<LogoutResponse>() {
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<LogoutResponse> call, Response<LogoutResponse> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     // 로그아웃 성공
                     System.out.println("response: " + response);
@@ -73,7 +73,7 @@ public class LogoutUtil {
             }
 
             @Override
-            public void onFailure(Call<LogoutResponse> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 // 요청 실패
                 Toast.makeText(context, "네트워크 오류: 로그아웃 실패", Toast.LENGTH_SHORT).show();
             }

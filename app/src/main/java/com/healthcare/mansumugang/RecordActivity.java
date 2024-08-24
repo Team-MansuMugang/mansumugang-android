@@ -283,10 +283,10 @@ public class RecordActivity extends AppCompatActivity {
             MultipartBody.Part body = MultipartBody.Part.createFormData("audio", audioFile.getName(), requestFile);
 
             ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-            Call<SaveResponse> call = apiService.saveAudio("Bearer " + token, body);
-            call.enqueue(new Callback<SaveResponse>() {
+            Call<Void> call = apiService.saveAudio("Bearer " + token, body);
+            call.enqueue(new Callback<Void>() {
                 @Override
-                public void onResponse(Call<SaveResponse> call, Response<SaveResponse> response) {
+                public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(RecordActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
                         if (audioFile.exists()){ audioFile.delete(); }
@@ -294,7 +294,7 @@ public class RecordActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<SaveResponse> call, Throwable t) {
+                public void onFailure(Call<Void> call, Throwable t) {
                     System.out.println(t);
                 }
             });

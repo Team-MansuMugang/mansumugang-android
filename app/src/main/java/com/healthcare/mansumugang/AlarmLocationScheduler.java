@@ -217,11 +217,11 @@ public class AlarmLocationScheduler {
         String token = App.prefs.getToken();
         IntakeRequest intakeRequest = new IntakeRequest(hospitalId);
 
-        Call<IntakeResponse> call = apiService.inTake("Bearer " + token, intakeRequest);
+        Call<Void> call = apiService.inTake("Bearer " + token, intakeRequest);
 
-        call.enqueue(new Callback<IntakeResponse>() {
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<IntakeResponse> call, Response<IntakeResponse> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     System.out.println("complete");
                 } else {
@@ -230,7 +230,7 @@ public class AlarmLocationScheduler {
             }
 
             @Override
-            public void onFailure(Call<IntakeResponse> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 Log.e(TAG, "API 호출 실패", t);
             }
         });
