@@ -6,11 +6,11 @@ import android.Manifest;
  * Constants 클래스는 애플리케이션에서 사용되는 상수를 정의합니다.
  */
 public class Constants {
-    static final String ALARM_RECIVER_TAG = "AlarmReceiver"; // 로그 출력을 위한 태그
+    static final String ALARM_RECIVER_TAG = "AlarmReceiver";
 
     static final String ALARM_SCHEDULER_TAG = "AlarmScheduler";
 
-    static final String ALARM_LOCATION_SCHEDULER_TAG = "AlarmLocationScheduler"; // 로그를 찍을 때 사용할 태그
+    static final String ALARM_LOCATION_SCHEDULER_TAG = "AlarmLocationScheduler";
 
     static final String CAMERA_ACTIVITY_TAG = "CAMERAACTIVITY";
 
@@ -22,7 +22,9 @@ public class Constants {
 
     static final String TOKEN_AUTHENTICATOR = "TokenAuthenticator";
 
-    static final  String PREVIEW = "Preview";
+    static final String PREVIEW = "Preview";
+
+    // LOG FOR TAGS
 
 
     static final String CHANNEL_ID = "alarm_channel"; // 알림 채널 ID
@@ -62,10 +64,6 @@ public class Constants {
 
     static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 
-    static final String[] PERMISSIONS = {
-            android.Manifest.permission.RECORD_AUDIO,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-    };
+    static final String[] RECORD_PERMISSIONS = {android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
 
 }

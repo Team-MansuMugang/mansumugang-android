@@ -1,10 +1,10 @@
 package com.healthcare.mansumugang;
 
-import android.Manifest;
 import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
@@ -18,6 +18,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +29,7 @@ import java.io.IOException;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -53,7 +58,7 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     private boolean hasPermissions() {
-        for (String permission : Constants.PERMISSIONS) {
+        for (String permission : Constants.RECORD_PERMISSIONS) {
             if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
                 return false;
             }
@@ -62,7 +67,7 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     private void requestAudioPermissions() {
-        ActivityCompat.requestPermissions(this, Constants.PERMISSIONS, Constants.REQUEST_RECORD_AUDIO_PERMISSION);
+        ActivityCompat.requestPermissions(this, Constants.RECORD_PERMISSIONS, Constants.REQUEST_RECORD_AUDIO_PERMISSION);
     }
 
     @Override
@@ -258,7 +263,7 @@ public class RecordActivity extends AppCompatActivity {
                 String token = App.prefs.getToken();
                 System.out.println("Conversion successful: " + convertedFile.getAbsolutePath());
                 audioFile.delete();
-                uploadFile(token,convertedFile);
+                uploadFile(token, convertedFile);
             }
 
             @Override
@@ -274,16 +279,37 @@ public class RecordActivity extends AppCompatActivity {
     private void uploadFile(String token, File audioFile) {
         if (audioFile != null && audioFile.exists()) {
             RequestBody requestFile = RequestBody.create(audioFile, MediaType.parse("audio/mp3"));
-            MultipartBody.Part body = MultipartBody.Part.createFormData("audio", audioFile.getName(), requestFile);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("file", audioFile.getName(), requestFile);
 
             ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-            Call<Void> call = apiService.saveAudio("Bearer " + token, body);
+            RequestBody model = RequestBody.create("whisper-1", MediaType.parse("text/plain"));
+
+            Call<Void> call = apiService.saveAudio("Bearer " + token, body, model);
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
-                        Toast.makeText(RecordActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
-                        if (audioFile.exists()){ audioFile.delete(); }
+                        // 파일 삭제
+                        if (audioFile.exists()) {
+                            audioFile.delete();
+                        }
+
+                    } else if (response.code() == 401) {
+                        Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                    } else {
+                        String errorMessage = "API 호출 실패";
+                        if (response.errorBody() != null) {
+                            try {
+                                String errorBody = response.errorBody().string();
+                                JsonParser parser = new JsonParser();
+                                JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
+                                errorMessage = jsonObject.has("message") ? jsonObject.get("message").getAsString() : "서버 오류";
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        Toast.makeText(RecordActivity.this, "오류 발생: " + errorMessage, Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -292,8 +318,7 @@ public class RecordActivity extends AppCompatActivity {
                     System.out.println(t);
                 }
             });
-        } else {
-            Toast.makeText(this, "No file to upload", Toast.LENGTH_SHORT).show();
+
         }
     }
 

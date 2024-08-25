@@ -9,13 +9,17 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
@@ -90,8 +94,6 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
     }
 
 
-
-
     private String getTodayDate() {
         SimpleDateFormat today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return today.format(new Date());
@@ -106,8 +108,6 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
     }
 
 
-
-
     private void fetchScheduleData(String date) {
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         String token = App.prefs.getToken();
@@ -119,8 +119,22 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
 
                 if (response.isSuccessful()) {
                     displaySchedule(response.body());
+                } else if (response.code() == 401) {
+                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
                 } else {
-                    Log.e(Constants.SCHEDULE_ACTIVITY, "Response unsuccessful or empty: " + response.body());
+                    String errorMessage = "API 호출 실패";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            JsonParser parser = new JsonParser();
+                            JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
+                            errorMessage = jsonObject.has("message") ? jsonObject.get("message").getAsString() : "서버 오류";
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    Toast.makeText(ScheduleActivity.this, "오류 발생: " + errorMessage, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -150,9 +164,22 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
 
                     fetchScheduleData(date);
 
+                } else if (response.code() == 401) {
+                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
                 } else {
                     // 실패 처리
-                    Log.e("ScheduleActivity", "API 호출 실패: " + response.message());
+                    String errorMessage = "API 호출 실패";
+                    try {
+                        String errorBody = response.errorBody().string();
+                        JsonParser parser = new JsonParser();
+                        JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
+                        errorMessage = jsonObject.has("message") ? jsonObject.get("message").getAsString() : "서버 오류";
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    Toast.makeText(ScheduleActivity.this, "오류 발생: " + errorMessage, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -183,10 +210,22 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
 
                 if (response.isSuccessful()) {
                     // 성공적으로 응답을 받았을 때 처리
-                        fetchScheduleData(date);
+                    fetchScheduleData(date);
+                } else if (response.code() == 401) {
+                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
                 } else {
-                    // 실패 처리
-                    Log.e("ScheduleActivity", "API 호출 실패: " + response.message());
+                    String errorMessage = "API 호출 실패";
+                    try {
+                        String errorBody = response.errorBody().string();
+                        JsonParser parser = new JsonParser();
+                        JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
+                        errorMessage = jsonObject.has("message") ? jsonObject.get("message").getAsString() : "서버 오류";
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    Toast.makeText(ScheduleActivity.this, "오류 발생: " + errorMessage, Toast.LENGTH_LONG).show();
                 }
             }
 

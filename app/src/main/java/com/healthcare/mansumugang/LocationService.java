@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
@@ -27,11 +28,7 @@ public class LocationService extends Service {
 
         // Create notification channel for Android 8.0 and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    Constants.LOCATION_SERVICE_CHANNEL,
-                    "Location Service Channel",
-                    NotificationManager.IMPORTANCE_LOW
-            );
+            NotificationChannel channel = new NotificationChannel(Constants.LOCATION_SERVICE_CHANNEL, "Location Service Channel", NotificationManager.IMPORTANCE_LOW);
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(channel);
@@ -39,10 +36,7 @@ public class LocationService extends Service {
         }
 
         // Start foreground service
-        Notification notification = new NotificationCompat.Builder(this, Constants.LOCATION_SERVICE_CHANNEL)
-                .setContentTitle("Location Service")
-                .setContentText("Tracking location in the background")
-                .setSmallIcon(R.drawable.location) // Replace with your icon
+        Notification notification = new NotificationCompat.Builder(this, Constants.LOCATION_SERVICE_CHANNEL).setContentTitle("Location Service").setContentText("Tracking location in the background").setSmallIcon(R.drawable.location) // Replace with your icon
                 .build();
 
         startForeground(1, notification);

@@ -78,37 +78,23 @@ public class LoginActivity extends AppCompatActivity {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
                 showPermissionExplanationDialog();
             } else {
-                ActivityCompat.requestPermissions(
-                        this,
-                        new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
-                        Constants.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
-                );
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, Constants.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE);
             }
         }
     }
 
     private void showPermissionExplanationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("권한 요청")
-                .setMessage("앱이 백그라운드에서 위치 정보를 사용하기 위해 권한이 필요합니다. 권한을 허용해 주세요.")
-                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions(
-                                LoginActivity.this,
-                                new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
-                                Constants.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
-                        );
-                    }
-                })
-                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplicationContext(), "권한이 필요합니다.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .create()
-                .show();
+        new AlertDialog.Builder(this).setTitle("권한 요청").setMessage("앱이 백그라운드에서 위치 정보를 사용하기 위해 권한이 필요합니다. 권한을 허용해 주세요.").setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ActivityCompat.requestPermissions(LoginActivity.this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, Constants.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE);
+            }
+        }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(), "권한이 필요합니다.", Toast.LENGTH_SHORT).show();
+            }
+        }).create().show();
     }
 
     private void openAppSettings() {
@@ -127,18 +113,12 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 // Background location permission denied
                 Toast.makeText(this, "백그라운드 위치 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show();
-                new AlertDialog.Builder(this)
-                        .setTitle("권한 필요")
-                        .setMessage("백그라운드 위치 권한이 필요합니다. 설정에서 권한을 허용해 주세요.")
-                        .setPositiveButton("설정으로 가기", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                openAppSettings();
-                            }
-                        })
-                        .setNegativeButton("취소", null)
-                        .create()
-                        .show();
+                new AlertDialog.Builder(this).setTitle("권한 필요").setMessage("백그라운드 위치 권한이 필요합니다. 설정에서 권한을 허용해 주세요.").setPositiveButton("설정으로 가기", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        openAppSettings();
+                    }
+                }).setNegativeButton("취소", null).create().show();
             }
         } else {
             // Handle other permission results

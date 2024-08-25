@@ -26,9 +26,9 @@ public class ScheduleItem {
     /**
      * 스케줄 뷰를 생성하여 반환합니다.
      *
-     * @param context          Context
-     * @param layoutBox        LinearLayout
-     * @param schedule         ScheduleResponse.Schedule
+     * @param context           Context
+     * @param layoutBox         LinearLayout
+     * @param schedule          ScheduleResponse.Schedule
      * @param imageApiUrlPrefix String
      * @return View
      */
@@ -89,7 +89,6 @@ public class ScheduleItem {
     }
 
 
-
     private static View createHospitalView(Context context, ScheduleResponse.Schedule.Hospital hospital) {
         View medicineView = LayoutInflater.from(context).inflate(R.layout.medicine_item, null, false);
 
@@ -125,8 +124,8 @@ public class ScheduleItem {
     /**
      * 약물 뷰를 생성하여 반환합니다.
      *
-     * @param context          Context
-     * @param medicine         ScheduleResponse.Schedule.Medicine
+     * @param context           Context
+     * @param medicine          ScheduleResponse.Schedule.Medicine
      * @param imageApiUrlPrefix String
      * @return View
      */
@@ -157,8 +156,7 @@ public class ScheduleItem {
 
             medicineImage.setLayoutParams(params);
             String imageUrl = imageApiUrlPrefix + medicine.getMedicineImageName();
-            Glide.with(context)
-                    .load(imageUrl)
+            Glide.with(context).load(imageUrl)
 
                     .into(medicineImage);
         }
@@ -196,15 +194,15 @@ public class ScheduleItem {
 
         }
     }
+
     private static void setTakingHospitalButtonAttributes(Boolean inTimeRange, TextView takingButton, Boolean status) {
         if (status) {
             takingButton.setText("병원을 방문하셨어요!");
             takingButton.setBackgroundResource(R.drawable.schedule_button_gray);
-        } else if (inTimeRange){
+        } else if (inTimeRange) {
             takingButton.setText("병원에 방문하셨다면 여기를 눌러주세요");
             takingButton.setBackgroundResource(R.drawable.schedule_button_blue);
-        } else
-        {
+        } else {
             takingButton.setText("병원에 방문예정이 있습니다");
             takingButton.setBackgroundResource(R.drawable.schedule_button_gray);
             takingButton.setEnabled(false);

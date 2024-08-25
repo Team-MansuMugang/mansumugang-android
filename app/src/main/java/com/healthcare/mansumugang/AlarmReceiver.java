@@ -27,7 +27,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         scheduler.fetchLocationAndSchedule(date);
 
         // time이 null일 경우 알림을 울리지 않고 메서드를 종료합니다.
-        if (date == null ||time == null) {
+        if (date == null || time == null) {
             Log.d(Constants.ALARM_RECIVER_TAG, "Time is null, not triggering notification.");
             return;
         }
@@ -37,21 +37,14 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         // 알림 채널을 설정합니다 (Android O 이상에서 필요).
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    Constants.CHANNEL_ID,
-                    "Alarm Notifications",
-                    NotificationManager.IMPORTANCE_HIGH
-            );
+            NotificationChannel channel = new NotificationChannel(Constants.CHANNEL_ID, "Alarm Notifications", NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(channel);
         }
 
         // 알림을 구성합니다.
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Constants.CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification) // 알림 아이콘
-                .setContentTitle("Medicine Reminder")
-                .setContentText(notificationContent) // 새로운 알림 내용 설정
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true); // 알림 클릭 시 자동으로 사라짐
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Constants.CHANNEL_ID).setSmallIcon(R.drawable.ic_notification) // 알림 아이콘
+                .setContentTitle("Medicine Reminder").setContentText(notificationContent) // 새로운 알림 내용 설정
+                .setPriority(NotificationCompat.PRIORITY_HIGH).setAutoCancel(true); // 알림 클릭 시 자동으로 사라짐
 
         // 알림을 표시합니다.
         notificationManager.notify(1, builder.build());

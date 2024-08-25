@@ -1,10 +1,16 @@
 package com.healthcare.mansumugang;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 import android.app.ActivityManager;
 import android.content.Intent;
 
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -24,7 +30,6 @@ public class LogoutUtil {
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         String refreshToken = App.prefs.getRefreshToken(); // 리프레시 토큰
 
-        Call<Void> call = apiService.logout("Bearer " + refreshToken);
 
         // 저장된 토큰 및 사용자 정보 삭제
         App.prefs.setToken(null);
@@ -55,6 +60,7 @@ public class LogoutUtil {
             context.startService(stopLocationServiceIntent);
         }
 
+        Call<Void> call = apiService.logout("Bearer " + refreshToken);
 
         call.enqueue(new Callback<Void>() {
             @Override
@@ -63,11 +69,22 @@ public class LogoutUtil {
                     // 로그아웃 성공
                     System.out.println("response: " + response);
                     Toast.makeText(context, "로그아웃 성공", Toast.LENGTH_SHORT).show();
+                } else if (response.code() == 401) {
+                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
                 } else {
-                    // 로그아웃 실패
-                    System.out.println("response: " + response);
+                    String errorMessage = "API 호출 실패";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            JsonParser parser = new JsonParser();
+                            JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
+                            errorMessage = jsonObject.has("message") ? jsonObject.get("message").getAsString() : "서버 오류";
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
-                    Toast.makeText(context, "로그아웃 실패", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "오류 발생: " + errorMessage, Toast.LENGTH_LONG).show();
                 }
             }
 

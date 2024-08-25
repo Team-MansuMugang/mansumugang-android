@@ -1,6 +1,7 @@
 package com.healthcare.mansumugang;
 
 import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class ScheduleResponse {
@@ -79,11 +80,9 @@ public class ScheduleResponse {
             }
 
 
-
             public String getMedicineImageName() {
                 return medicineImageName;
             }
-
 
 
             public String getHospitalName() {
@@ -96,13 +95,13 @@ public class ScheduleResponse {
             }
 
 
-
             public String getMedicineName() {
                 return medicineName;
             }
 
 
         }
+
         public static class Hospital {
 
             private long hospitalId;
@@ -161,5 +160,5 @@ public class ScheduleResponse {
 
         }
 
-        }
+    }
 }

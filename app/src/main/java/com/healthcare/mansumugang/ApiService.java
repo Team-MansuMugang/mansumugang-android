@@ -2,6 +2,7 @@ package com.healthcare.mansumugang;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -30,21 +31,19 @@ public interface ApiService {
 
     /**
      * 서버로 토큰 갱신 요청을 보냅니다.
-     * @param accessToken     현재 액세스 토큰
-     * @param refreshToken    리프레시 토큰
+     *
+     * @param accessToken  현재 액세스 토큰
+     * @param refreshToken 리프레시 토큰
      * @return TokenResponse 객체를 포함하는 Call
      */
     @Headers("Content-Type: application/json")
     @POST("api/auth/refreshToken")
-
-    Call<RefreshTokenResponse> refreshToken(
-            @Header("Authorization") String accessToken,
-            @Header("Authorization-refresh") String refreshToken);
+    Call<RefreshTokenResponse> refreshToken(@Header("Authorization") String accessToken, @Header("Authorization-refresh") String refreshToken);
 
     /**
      * 서버로 위치 정보를 저장 요청을 보냅니다.
      *
-     * @param accessToken 인증 토큰
+     * @param accessToken     인증 토큰
      * @param locationRequest 위치 정보 요청 본문
      * @return 서버로부터의 응답을 포함하는 Call 객체
      */
@@ -55,26 +54,24 @@ public interface ApiService {
 
     /**
      * 서버로 로그아웃 요청을 보냅니다.
-     * @param refreshToken    리프레시 토큰
+     *
+     * @param refreshToken 리프레시 토큰
      * @return LogoutResponse 객체를 포함하는 Call
      */
     @Headers("Content-Type: application/json")
     @POST("api/auth/logout")
-    Call<Void> logout(
-            @Header("Authorization-refresh") String refreshToken);
+    Call<Void> logout(@Header("Authorization-refresh") String refreshToken);
 
 
     /**
      * 서버로 일정 요청을 보냅니다.
      *
      * @param accessToken 인증 토큰
-     * @param date 조회 일자
+     * @param date        조회 일자
      * @return 서버로부터의 응답을 포함하는 Call 객체
      */
     @GET("api/medicine/patient")
-    Call<ScheduleResponse> getSchedule(
-            @Header("Authorization") String accessToken,
-            @Query("date") String date);
+    Call<ScheduleResponse> getSchedule(@Header("Authorization") String accessToken, @Query("date") String date);
 
 
     /**
@@ -84,11 +81,7 @@ public interface ApiService {
      * @return 서버로부터의 응답을 포함하는 Call 객체
      */
     @POST("api/medicine/intake/toggle")
-    Call<Void> inTake(
-            @Header("Authorization") String accessToken
-            , @Body IntakeRequest inTakeRequest);
-
-
+    Call<Void> inTake(@Header("Authorization") String accessToken, @Body IntakeRequest inTakeRequest);
 
 
     /**
@@ -99,10 +92,9 @@ public interface ApiService {
      */
     @Multipart
     @POST("api/record/save")
-    Call<Void> saveAudio(
-            @Header("Authorization") String accessToken
-            ,            @Part MultipartBody.Part audio
-            );
+    Call<Void> saveAudio(@Header("Authorization") String accessToken, @Part MultipartBody.Part file, @Part("model") RequestBody model
+
+    );
 
 
     /**
@@ -113,10 +105,7 @@ public interface ApiService {
      */
     @Multipart
     @POST("api/medicine/prescription")
-    Call<Void> saveImage(
-            @Header("Authorization") String accessToken
-            ,            @Part MultipartBody.Part image
-    );
+    Call<Void> saveImage(@Header("Authorization") String accessToken, @Part MultipartBody.Part image);
 
 
     /**
@@ -126,6 +115,5 @@ public interface ApiService {
      * @return 서버로부터의 응답을 포함하는 Call 객체
      */
     @GET("api/user/inquiry/familyMember")
-    Call<FamilyMemberResponse> getFamilyMember(
-            @Header("Authorization") String accessToken);
+    Call<FamilyMemberResponse> getFamilyMember(@Header("Authorization") String accessToken);
 }

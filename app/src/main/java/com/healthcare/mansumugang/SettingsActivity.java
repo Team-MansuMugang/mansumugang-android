@@ -2,17 +2,23 @@ package com.healthcare.mansumugang;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -58,13 +64,33 @@ public class SettingsActivity extends AppCompatActivity {
             public void onResponse(Call<FamilyMemberResponse> call, Response<FamilyMemberResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     FamilyMemberResponse familyMemberResponse = response.body();
-                    addFamilyMemberToView(familyMemberResponse.getSelf(), "본인" , familyMemberResponse.getImageApiUrl());
-                    addFamilyMemberToView(familyMemberResponse.getProtector(), "보호자",familyMemberResponse.getImageApiUrl());
+                    addFamilyMemberToView(familyMemberResponse.getSelf(), "본인", familyMemberResponse.getImageApiUrl());
+                    addFamilyMemberToView(familyMemberResponse.getProtector(), "보호자", familyMemberResponse.getImageApiUrl());
 
                     for (FamilyMemberResponse.FamilyMember otherPatient : familyMemberResponse.getOtherPatients()) {
-                        addFamilyMemberToView(otherPatient, "환자",familyMemberResponse.getImageApiUrl());
+                        addFamilyMemberToView(otherPatient, "환자", familyMemberResponse.getImageApiUrl());
                     }
+                } else if (response.code() == 401) {
+                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                } else {
+                    String errorMessage = "알 수 없는 오류";
+
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            System.out.println(errorBody);
+
+                            JsonParser parser = new JsonParser();
+                            JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
+                            errorMessage = jsonObject.has("message") ? jsonObject.get("message").getAsString() : "서버 오류";
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    Toast.makeText(SettingsActivity.this, "오류 발생: " + errorMessage, Toast.LENGTH_LONG).show();
                 }
+
             }
 
             @Override
@@ -80,8 +106,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         // LinearLayout 생성 (상위 컨테이너)
         LinearLayout layout = new LinearLayout(this);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(dpToPx(15), dpToPx(15), dpToPx(15), 0);
         layout.setLayoutParams(layoutParams);
         layout.setOrientation(LinearLayout.HORIZONTAL);
@@ -100,9 +125,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         } else {
 
-            String imageUrl = getImageApiUrl +member.getProfileImageName();
-            Glide.with(this)
-                    .load(imageUrl)
+            String imageUrl = getImageApiUrl + member.getProfileImageName();
+            Glide.with(this).load(imageUrl)
 
                     .into(imageView);
         }
@@ -112,13 +136,11 @@ public class SettingsActivity extends AppCompatActivity {
 // 첫 번째 수평 LinearLayout 생성 (nameTextView와 roleTextView를 위한 레이아웃)
         LinearLayout topLayout = new LinearLayout(this);
         topLayout.setOrientation(LinearLayout.HORIZONTAL);
-        topLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        topLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
 // TextView for name 생성
         TextView nameTextView = new TextView(this);
-        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         nameParams.leftMargin = dpToPx(10);
         nameTextView.setLayoutParams(nameParams);
         nameTextView.setText(member.getName());
@@ -129,8 +151,7 @@ public class SettingsActivity extends AppCompatActivity {
 // TextView for role 생성
         // TextView for role 생성
         TextView roleTextView = new TextView(this);
-        LinearLayout.LayoutParams roleParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams roleParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         roleParams.leftMargin = dpToPx(10);
         roleTextView.setLayoutParams(roleParams);
         roleTextView.setText(role);
@@ -154,13 +175,11 @@ public class SettingsActivity extends AppCompatActivity {
 // 두 번째 수평 LinearLayout 생성 (telephoneTextView를 위한 레이아웃)
         LinearLayout bottomLayout = new LinearLayout(this);
         bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
-        bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        bottomLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
 // TextView for telephone 생성
         TextView telephoneTextView = new TextView(this);
-        LinearLayout.LayoutParams telephoneParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams telephoneParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         telephoneParams.leftMargin = dpToPx(10);
         telephoneTextView.setLayoutParams(telephoneParams);
         telephoneTextView.setText(member.getTelephone() != null ? member.getTelephone() : "전화번호 없음");
@@ -175,8 +194,7 @@ public class SettingsActivity extends AppCompatActivity {
 // 수직 LinearLayout 생성 (topLayout과 bottomLayout을 위한 레이아웃)
         LinearLayout verticalLayout = new LinearLayout(this);
         verticalLayout.setOrientation(LinearLayout.VERTICAL);
-        verticalLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        verticalLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         verticalLayout.addView(topLayout);
         verticalLayout.addView(bottomLayout);
 

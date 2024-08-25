@@ -37,15 +37,10 @@ public class LocationHelper {
     }
 
     public void fetchLocationOnce() {
-        LocationRequest locationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(Constants.LOCATION_UPDATE_INTERVAL_MS)
-                .setFastestInterval(Constants.LOCATION_UPDATE_FASTEST_INTERVAL_MS)
-                .setNumUpdates(1); // 위치 업데이트를 한 번만 받도록 설정
+        LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(Constants.LOCATION_UPDATE_INTERVAL_MS).setFastestInterval(Constants.LOCATION_UPDATE_FASTEST_INTERVAL_MS).setNumUpdates(1); // 위치 업데이트를 한 번만 받도록 설정
 
         // 위치 권한이 있는지 확인
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // 권한이 없는 경우, 권한 요청 또는 사용자에게 알림
             Log.e(Constants.LOCATION_HELPER_TAG, "Location permissions are not granted.");
             return;

@@ -13,11 +13,11 @@
 
 
     <ImageView
-        android:paddingTop="14dp"
         android:id="@+id/medicineImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="14dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"

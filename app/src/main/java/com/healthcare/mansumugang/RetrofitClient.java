@@ -16,6 +16,7 @@ public class RetrofitClient {
      * Retrofit 인스턴스를 반환합니다.
      * 싱글톤 패턴을 사용하여 이미 생성된 인스턴스가 있으면 해당 인스턴스를 반환하고,
      * 그렇지 않으면 새로 생성하여 반환합니다.
+     *
      * @return Retrofit 인스턴스
      */
     public static Retrofit getRetrofitInstance() {

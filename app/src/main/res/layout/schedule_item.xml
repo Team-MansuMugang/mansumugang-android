@@ -1,23 +1,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_margin="30dp"
     android:background="@drawable/edit_round"
     android:gravity="center"
-    android:layout_margin="30dp"
-    >
+    android:orientation="vertical">
 
     <TextView
-        android:layout_marginTop="10dp"
         android:id="@+id/timeText"
-        android:textColor="@color/Black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="시간"
         android:paddingBottom="10dp"
-        android:textStyle="bold"
-        android:textSize="20dp"/>
+        android:text="시간"
+        android:textColor="@color/Black"
+        android:textSize="20dp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:id="@+id/additionalBox"
@@ -27,12 +26,12 @@
 
     <TextView
         android:id="@+id/TakingButtonAct"
-        android:textColor="@color/White"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
         android:background="@drawable/schedule_button_red"
         android:text="btn"
-        android:textSize="18dp"/>
+        android:textAlignment="center"
+        android:textColor="@color/White"
+        android:textSize="18dp" />
 
 </LinearLayout>

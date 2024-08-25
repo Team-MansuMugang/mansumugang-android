@@ -9,7 +9,12 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,9 +44,7 @@ public class AlarmLocationScheduler {
         intent.setAction("FETCH_LOCATION_AND_SCHEDULE"); // Custom action 설정
         intent.putExtra("date", date);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context, Constants.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Constants.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         long triggerTime = SystemClock.elapsedRealtime();
 
@@ -49,12 +52,7 @@ public class AlarmLocationScheduler {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (alarmManager.canScheduleExactAlarms()) {
                     try {
-                        alarmManager.setRepeating(
-                                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                triggerTime,
-                                Constants.REFRESH_INTERVAL,
-                                pendingIntent
-                        );
+                        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, Constants.REFRESH_INTERVAL, pendingIntent);
                     } catch (SecurityException e) {
                         Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Permission denied for scheduling exact alarms: " + e.getMessage());
                     }
@@ -65,12 +63,7 @@ public class AlarmLocationScheduler {
                     context.startActivity(exactAlarmIntent);
                 }
             } else {
-                alarmManager.setRepeating(
-                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        triggerTime,
-                        Constants.REFRESH_INTERVAL,
-                        pendingIntent
-                );
+                alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, Constants.REFRESH_INTERVAL, pendingIntent);
             }
         }
     }
@@ -82,9 +75,7 @@ public class AlarmLocationScheduler {
         intent.putExtra("date", ""); // date 인자를 빈 문자열로 설정
 
         // 알람 설정 시와 동일한 PendingIntent 생성
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context, Constants.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Constants.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         System.out.println("stop scheduling");
 
@@ -128,8 +119,22 @@ public class AlarmLocationScheduler {
                 if (response.isSuccessful() && response.body() != null) {
                     List<ScheduleResponse.Schedule> schedules = response.body().getMedicineSchedules();
                     processSchedules(schedules, response.body(), currentLatitude, currentLongitude);
+                } else if (response.code() == 401) {
+                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
                 } else {
-                    Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Response unsuccessful or empty: " + response.message());
+                    String errorMessage = "API 호출 실패";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            JsonParser parser = new JsonParser();
+                            JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
+                            errorMessage = jsonObject.has("message") ? jsonObject.get("message").getAsString() : "서버 오류";
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    Toast.makeText(context, "오류 발생: " + errorMessage, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -169,7 +174,6 @@ public class AlarmLocationScheduler {
                 oneHourAfter.add(Calendar.HOUR_OF_DAY, 1);
 
 
-
                 if (currentTime.before(oneHourBefore) && !currentTime.after(oneHourAfter)) {
                     double latitude = schedule.getHospital().getLatitude();
                     double longitude = schedule.getHospital().getLongitude();
@@ -181,9 +185,9 @@ public class AlarmLocationScheduler {
 
                     if (distanceInMeters <= 1000) {
                         Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "병원이 1km 내에 있습니다.");
-                        if(!schedule.getHospital().isHospitalStatus()){
+                        if (!schedule.getHospital().isHospitalStatus()) {
                             System.out.println("sendBroadcast");
-                            handleTakingButtonClick(schedule.getHospital().getHospitalId(),scheduleResponse.getDate());
+                            handleTakingButtonClick(schedule.getHospital().getHospitalId(), scheduleResponse.getDate());
 
                         }
                         // 추가 로직을 여기에 추가 (예: 알림 보내기, 특정 작업 수행 등)
@@ -220,8 +224,22 @@ public class AlarmLocationScheduler {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     System.out.println("complete");
+                } else if (response.code() == 401) {
+                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
                 } else {
-                    Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "API 호출 실패: " + response.message());
+                    String errorMessage = "API 호출 실패";
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            JsonParser parser = new JsonParser();
+                            JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
+                            errorMessage = jsonObject.has("message") ? jsonObject.get("message").getAsString() : "서버 오류";
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    Toast.makeText(context, "오류 발생: " + errorMessage, Toast.LENGTH_LONG).show();
                 }
             }
 

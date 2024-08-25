@@ -9,6 +9,7 @@ public class AudioConverter {
     // 인터페이스를 정의하여 콜백 방식으로 변환 결과를 전달
     public interface ConversionCallback {
         void onSuccess(File convertedFile);
+
         void onFailure(Exception error);
     }
 

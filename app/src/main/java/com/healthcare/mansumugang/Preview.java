@@ -24,6 +24,9 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -95,6 +98,7 @@ public class Preview extends Thread {
             }
         }
     }
+
     private String getBackFacingCameraId(CameraManager cManager) {
         try {
             for (String cameraId : cManager.getCameraIdList()) {
@@ -123,10 +127,8 @@ public class Preview extends Thread {
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             mPreviewSize = map.getOutputSizes(SurfaceTexture.class)[0];
 
-            if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA)
-                    == PackageManager.PERMISSION_DENIED) {
-                ActivityCompat.requestPermissions((Activity) mContext,
-                        new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
+            if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
             } else {
                 manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
             }
@@ -293,14 +295,31 @@ public class Preview extends Thread {
                                         @Override
                                         public void onResponse(Call<Void> call, Response<Void> response) {
                                             // 성공 응답 처리
-                                            System.out.println("성공");
-                                            imageFile.delete();
+                                            if (response.isSuccessful()) {
+                                                System.out.println("성공");
+                                                imageFile.delete();
+                                            } else if (response.code() == 401) {
+                                                Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                                            } else {
+                                                String errorMessage = "API 호출 실패";
+                                                if (response.errorBody() != null) {
+                                                    try {
+                                                        String errorBody = response.errorBody().string();
+                                                        JsonParser parser = new JsonParser();
+                                                        JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
+                                                        errorMessage = jsonObject.has("message") ? jsonObject.get("message").getAsString() : "서버 오류";
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+
+                                                Toast.makeText(mContext, "오류 발생: " + errorMessage, Toast.LENGTH_LONG).show();
+                                            }
                                         }
 
                                         @Override
                                         public void onFailure(Call<Void> call, Throwable t) {
                                             // 실패 응답 처리
-                                            System.out.println("실패~");
 
                                         }
                                     });

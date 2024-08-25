@@ -14,9 +14,6 @@ public class CustomLocationRequest {
 
     @Override
     public String toString() {
-        return "CustomLocationRequest{" +
-                "latitude=" + latitude +
-                ", longitude=" + longitude +
-                '}';
+        return "CustomLocationRequest{" + "latitude=" + latitude + ", longitude=" + longitude + '}';
     }
 }

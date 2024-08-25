@@ -86,11 +86,7 @@ public class PermissionSupport {
 
         // If the permission is not granted, request it
         if (!backgroundLocationGranted) {
-            ActivityCompat.requestPermissions(
-                    activity,
-                    new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
-                    Constants.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
-            );
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, Constants.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
 

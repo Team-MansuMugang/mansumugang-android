@@ -51,7 +51,7 @@ public class AlarmScheduler {
                 if (IsItemHasHospital) {
                     itemFirst = itemFirst.replace("hpItem", "");
                 }
-                notificationContent +=" "+ itemFirst.trim();
+                notificationContent += " " + itemFirst.trim();
 
                 // 기본 알림 내용 설정
 
@@ -95,8 +95,7 @@ public class AlarmScheduler {
         intent.putExtra("date", dateTimeFormat.format(scheduleTime.getTime()));
         intent.putExtra("time", scheduleTime.get(Calendar.HOUR_OF_DAY) + ":" + scheduleTime.get(Calendar.MINUTE));
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         try {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, scheduleTime.getTimeInMillis(), pendingIntent);

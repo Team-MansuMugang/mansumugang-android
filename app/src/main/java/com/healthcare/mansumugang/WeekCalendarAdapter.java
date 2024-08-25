@@ -61,7 +61,7 @@ public class WeekCalendarAdapter extends RecyclerView.Adapter<WeekCalendarAdapte
         if (selectedPosition == position) {
             holder.dateTextView.setBackgroundResource(R.drawable.week_calender_rounded_corner_active);
             holder.dateTextView.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.White));
-        }else{
+        } else {
             holder.dateTextView.setBackgroundResource(R.drawable.week_calender_rounded_corner);
             holder.dateTextView.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.Black));
         }

@@ -56,8 +56,7 @@ public class TokenAuthenticator implements Authenticator {
         // 인증 실패 코드 확인
         if (response.code() == 401 || response.code() == 403) {
             // 이미 토큰 갱신 시도를 했는지 확인하여 무한 루프 방지
-            if (response.request().header("Authorization-refresh") != null &&
-                    response.request().header("Authorization-refresh").startsWith("Bearer " + refreshToken)) {
+            if (response.request().header("Authorization-refresh") != null && response.request().header("Authorization-refresh").startsWith("Bearer " + refreshToken)) {
                 return null; // 무한 루프 방지를 위해 null 반환
             }
 
@@ -68,10 +67,7 @@ public class TokenAuthenticator implements Authenticator {
 
             try {
                 // 토큰 갱신 요청
-                Call<RefreshTokenResponse> call = apiService.refreshToken(
-                        "Bearer " + accessToken,
-                        "Bearer " + refreshToken
-                );
+                Call<RefreshTokenResponse> call = apiService.refreshToken("Bearer " + accessToken, "Bearer " + refreshToken);
                 retrofit2.Response<RefreshTokenResponse> tokenResponse = call.execute();
 
                 if (tokenResponse.isSuccessful()) {
@@ -83,9 +79,7 @@ public class TokenAuthenticator implements Authenticator {
                         Log.d(Constants.TOKEN_AUTHENTICATOR, "New access token: " + newToken.getAccessToken());
 
                         // 새로운 액세스 토큰을 사용하여 원래 요청 재시도
-                        return response.request().newBuilder()
-                                .header("Authorization", "Bearer " + newToken.getAccessToken())
-                                .build();
+                        return response.request().newBuilder().header("Authorization", "Bearer " + newToken.getAccessToken()).build();
                     } else {
                         Log.e(Constants.TOKEN_AUTHENTICATOR, "TokenResponse is null");
                     }

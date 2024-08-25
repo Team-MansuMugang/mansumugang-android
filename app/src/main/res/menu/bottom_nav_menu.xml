@@ -3,25 +3,25 @@
         android:id="@+id/schedule"
         android:enabled="true"
         android:icon="@drawable/time"
-        android:title="일정"/>
+        android:title="일정" />
     <item
         android:id="@+id/recording"
         android:enabled="true"
         android:icon="@drawable/recording"
-        android:title="녹음"/>
+        android:title="녹음" />
     <item
         android:id="@+id/camera"
         android:enabled="true"
         android:icon="@drawable/camera"
-        android:title="카메라"/>
+        android:title="카메라" />
     <item
         android:id="@+id/guideline"
         android:enabled="true"
         android:icon="@drawable/note"
-        android:title="사용설명서"/>
+        android:title="사용설명서" />
     <item
         android:id="@+id/settings"
         android:enabled="true"
         android:icon="@drawable/settings"
-        android:title="설정"/>
+        android:title="설정" />
 </menu>

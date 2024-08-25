@@ -8,7 +8,11 @@
         </shape>
     </item>
     <!-- Red circle background -->
-    <item android:right="20dp" android:left="20dp" android:top="20dp" android:bottom="20dp">
+    <item
+        android:bottom="20dp"
+        android:left="20dp"
+        android:right="20dp"
+        android:top="20dp">
         <shape android:shape="oval">
             <solid android:color="#FF0000" />
         </shape>
