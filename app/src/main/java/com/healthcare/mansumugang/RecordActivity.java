@@ -30,12 +30,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RecordActivity extends AppCompatActivity {
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    private static final String[] PERMISSIONS = {
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-    };
     private MediaRecorder mediaRecorder;
     private boolean isRecording = false;
     private String filePath = "";
@@ -59,7 +53,7 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     private boolean hasPermissions() {
-        for (String permission : PERMISSIONS) {
+        for (String permission : Constants.PERMISSIONS) {
             if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
                 return false;
             }
@@ -68,13 +62,13 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     private void requestAudioPermissions() {
-        ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_RECORD_AUDIO_PERMISSION);
+        ActivityCompat.requestPermissions(this, Constants.PERMISSIONS, Constants.REQUEST_RECORD_AUDIO_PERMISSION);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+        if (requestCode == Constants.REQUEST_RECORD_AUDIO_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 initializeRecordingButtons();
             } else {

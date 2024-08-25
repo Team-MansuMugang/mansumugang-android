@@ -1,6 +1,5 @@
 package com.healthcare.mansumugang;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -19,7 +18,6 @@ import retrofit2.HttpException;
  */
 public class TokenAuthenticator implements Authenticator {
 
-    private static final String TAG = "TokenAuthenticator";
     private Context context;
     private boolean isTokenRefreshing = false;
     private AlarmLocationScheduler alarmLocationScheduler;
@@ -44,11 +42,11 @@ public class TokenAuthenticator implements Authenticator {
      */
     @Override
     public Request authenticate(Route route, Response response) throws IOException {
-        Log.d(TAG, "authenticate() called");
+        Log.d(Constants.TOKEN_AUTHENTICATOR, "authenticate() called");
 
         // 이미 토큰 갱신이 시도되었는지 확인하여 무한 루프 방지
         if (isTokenRefreshing) {
-            Log.d(TAG, "Token is already refreshing. Skipping further attempts.");
+            Log.d(Constants.TOKEN_AUTHENTICATOR, "Token is already refreshing. Skipping further attempts.");
             return null;
         }
 
@@ -82,23 +80,23 @@ public class TokenAuthenticator implements Authenticator {
                     if (newToken != null) {
                         // 새로운 액세스 토큰 저장
                         App.prefs.setToken(newToken.getAccessToken());
-                        Log.d(TAG, "New access token: " + newToken.getAccessToken());
+                        Log.d(Constants.TOKEN_AUTHENTICATOR, "New access token: " + newToken.getAccessToken());
 
                         // 새로운 액세스 토큰을 사용하여 원래 요청 재시도
                         return response.request().newBuilder()
                                 .header("Authorization", "Bearer " + newToken.getAccessToken())
                                 .build();
                     } else {
-                        Log.e(TAG, "TokenResponse is null");
+                        Log.e(Constants.TOKEN_AUTHENTICATOR, "TokenResponse is null");
                     }
                 } else {
-                    Log.e(TAG, "토큰 갱신 실패: " + tokenResponse.message());
+                    Log.e(Constants.TOKEN_AUTHENTICATOR, "토큰 갱신 실패: " + tokenResponse.message());
 
                     if (tokenResponse.code() == 401) {
                         // NoSuchRefreshTokenError 발생 시 로그아웃 처리
                         String errorBody = tokenResponse.errorBody() != null ? tokenResponse.errorBody().string() : "";
                         if (errorBody.contains("NoSuchRefreshTokenError")) {
-                            Log.e(TAG, "Refresh token is invalid. Logging out...");
+                            Log.e(Constants.TOKEN_AUTHENTICATOR, "Refresh token is invalid. Logging out...");
 
                             LogoutUtil.performLogout(context, alarmLocationScheduler);
                             Intent intent = new Intent(context, LoginActivity.class);
@@ -108,11 +106,11 @@ public class TokenAuthenticator implements Authenticator {
                     }
                 }
             } catch (HttpException e) {
-                Log.e(TAG, "HttpException: " + e.getMessage());
+                Log.e(Constants.TOKEN_AUTHENTICATOR, "HttpException: " + e.getMessage());
             } catch (IOException e) {
-                Log.e(TAG, "IOException: " + e.getMessage());
+                Log.e(Constants.TOKEN_AUTHENTICATOR, "IOException: " + e.getMessage());
             } catch (Exception e) {
-                Log.e(TAG, "Exception: " + e.getMessage());
+                Log.e(Constants.TOKEN_AUTHENTICATOR, "Exception: " + e.getMessage());
             } finally {
                 isTokenRefreshing = false;
             }

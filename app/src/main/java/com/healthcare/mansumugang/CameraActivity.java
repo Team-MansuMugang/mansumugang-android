@@ -25,9 +25,6 @@ public class CameraActivity extends AppCompatActivity {
 
     Activity mainActivity = this;
 
-    private static final String TAG = "MAINACTIVITY";
-
-    static final int REQUEST_CAMERA = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +48,7 @@ public class CameraActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case REQUEST_CAMERA:
+            case Constants.REQUEST_CAMERA:
                 for (int i = 0; i < permissions.length; i++) {
                     String permission = permissions[i];
                     int grantResult = grantResults[i];
@@ -60,7 +57,7 @@ public class CameraActivity extends AppCompatActivity {
                             mCameraTextureView = (TextureView) findViewById(R.id.cameraTextureView);
                             mPreview = new Preview(mainActivity, mCameraTextureView, mCameraCaptureButton);
                             mPreview.openCamera();
-                            Log.d(TAG, "mPreview set");
+                            Log.d(Constants.CAMERA_ACTIVITY_TAG, "mPreview set");
                         } else {
                             Toast.makeText(this, "Should have camera permission to run", Toast.LENGTH_LONG).show();
                             finish();
@@ -74,12 +71,10 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        mPreview.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        mPreview.onPause();
     }
 }

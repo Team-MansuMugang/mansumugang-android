@@ -14,7 +14,6 @@ import java.util.Locale;
 
 public class AlarmScheduler {
 
-    private static final String TAG = "AlarmScheduler";
     private static final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
 
     // 해당 medicineNames에 대해 알람을 취소하는 메서드
@@ -32,7 +31,7 @@ public class AlarmScheduler {
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
                 if (pendingIntent != null) {
                     alarmManager.cancel(pendingIntent);
-                    Log.d(TAG, "Cancelled alarm for: " + dateTimeString);
+                    Log.d(Constants.ALARM_SCHEDULER_TAG, "Cancelled alarm for: " + dateTimeString);
                 }
             }
         }
@@ -84,7 +83,7 @@ public class AlarmScheduler {
                     e.printStackTrace();
                 }
             } else {
-                Log.e(TAG, "Invalid schedule item size: " + scheduleItem.size());
+                Log.e(Constants.ALARM_SCHEDULER_TAG, "Invalid schedule item size: " + scheduleItem.size());
             }
         }
     }
@@ -101,9 +100,9 @@ public class AlarmScheduler {
 
         try {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, scheduleTime.getTimeInMillis(), pendingIntent);
-            Log.d(TAG, "Alarm set for: " + dateTimeFormat.format(scheduleTime.getTime()) + " with content: " + notificationContent + " and ID: " + notificationId);
+            Log.d(Constants.ALARM_SCHEDULER_TAG, "Alarm set for: " + dateTimeFormat.format(scheduleTime.getTime()) + " with content: " + notificationContent + " and ID: " + notificationId);
         } catch (SecurityException e) {
-            Log.e(TAG, "Exact alarm scheduling failed: " + e.getMessage());
+            Log.e(Constants.ALARM_SCHEDULER_TAG, "Exact alarm scheduling failed: " + e.getMessage());
         }
     }
 

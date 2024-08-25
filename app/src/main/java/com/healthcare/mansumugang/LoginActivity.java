@@ -35,10 +35,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText loginIdEditText;
     private EditText loginPasswordEditText;
     private Button loginButton;
-    private static final String TAG = "LoginActivity";
     private PermissionSupport permission;
 
-    private static final int BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 1024;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(
                         this,
                         new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
-                        BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
+                        Constants.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
                 );
             }
         }
@@ -99,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
                         ActivityCompat.requestPermissions(
                                 LoginActivity.this,
                                 new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
-                                BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
+                                Constants.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
                         );
                     }
                 })
@@ -122,7 +120,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE) {
+        if (requestCode == Constants.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Background location permission granted
                 Toast.makeText(this, "백그라운드 위치 권한이 허용되었습니다.", Toast.LENGTH_SHORT).show();
@@ -217,6 +215,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        Log.e(TAG, message);
+        Log.e(Constants.LOGIN_ACTIVITY, message);
     }
 }

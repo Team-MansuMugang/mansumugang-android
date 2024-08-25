@@ -32,7 +32,6 @@ import retrofit2.Response;
  */
 public class ScheduleActivity extends AppCompatActivity implements OnDateSelectedListener {
     private RecyclerView weekRecyclerView;
-    private static final String TAG = "ScheduleActivity";
     private WeekCalendarAdapter weekCalendarAdapter;
     private LinearLayout layoutBox;
     private ScrollView scrollView;
@@ -102,7 +101,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
     public void onDateSelected(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String formattedDate = sdf.format(date);
-        Log.d(TAG, "Selected date: " + formattedDate);
+        Log.d(Constants.SCHEDULE_ACTIVITY, "Selected date: " + formattedDate);
         fetchScheduleData(formattedDate);
     }
 
@@ -121,13 +120,13 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
                 if (response.isSuccessful()) {
                     displaySchedule(response.body());
                 } else {
-                    Log.e(TAG, "Response unsuccessful or empty: " + response.body());
+                    Log.e(Constants.SCHEDULE_ACTIVITY, "Response unsuccessful or empty: " + response.body());
                 }
             }
 
             @Override
             public void onFailure(Call<ScheduleResponse> call, Throwable t) {
-                Log.e(TAG, "API call failed: " + t.getMessage());
+                Log.e(Constants.SCHEDULE_ACTIVITY, "API call failed: " + t.getMessage());
             }
         });
 
@@ -260,7 +259,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
             currentTime.add(Calendar.MINUTE, -1); // Consider adding a small margin
             return scheduleTime != null && scheduleTime.before(currentTime.getTime());
         } catch (ParseException e) {
-            Log.e(TAG, "Date parsing error: ", e);
+            Log.e(Constants.SCHEDULE_ACTIVITY, "Date parsing error: ", e);
             return false;
         }
     }

@@ -55,15 +55,7 @@ public class BottomNavigationViewHelper {
                 return false;
             }
         });
-//        if (activity instanceof RecordActivity) {
-//            bottomNavigationView.setSelectedItemId(R.id.recording);
-//        } else if (activity instanceof ScheduleActivity) {
-//            bottomNavigationView.setSelectedItemId(R.id.schedule);
-//        } else if (activity instanceof GuidelineActivity) {
-//            bottomNavigationView.setSelectedItemId(R.id.guideline);
-//        } else if (activity instanceof SettingsActivity) {
-//            bottomNavigationView.setSelectedItemId(R.id.settings);
-//        }
+
     }
 
 }

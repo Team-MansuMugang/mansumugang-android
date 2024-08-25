@@ -24,9 +24,6 @@ import retrofit2.Response;
  */
 public class LocationHelper {
 
-    private static final String TAG = "LocationHelper";
-    private static final long LOCATION_UPDATE_INTERVAL_MS = 10000; // 10초
-    private static final long LOCATION_UPDATE_FASTEST_INTERVAL_MS = 5000; // 5초
 
     private Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -42,20 +39,20 @@ public class LocationHelper {
     public void fetchLocationOnce() {
         LocationRequest locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(LOCATION_UPDATE_INTERVAL_MS)
-                .setFastestInterval(LOCATION_UPDATE_FASTEST_INTERVAL_MS)
+                .setInterval(Constants.LOCATION_UPDATE_INTERVAL_MS)
+                .setFastestInterval(Constants.LOCATION_UPDATE_FASTEST_INTERVAL_MS)
                 .setNumUpdates(1); // 위치 업데이트를 한 번만 받도록 설정
 
         // 위치 권한이 있는지 확인
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // 권한이 없는 경우, 권한 요청 또는 사용자에게 알림
-            Log.e(TAG, "Location permissions are not granted.");
+            Log.e(Constants.LOCATION_HELPER_TAG, "Location permissions are not granted.");
             return;
         }
 
         // 위치 업데이트 요청
-        Log.d(TAG, "Requesting location updates");
+        Log.d(Constants.LOCATION_HELPER_TAG, "Requesting location updates");
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
     }
 
@@ -64,7 +61,7 @@ public class LocationHelper {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null || locationResult.getLocations().isEmpty()) {
-                    Log.e(TAG, "No location result available.");
+                    Log.e(Constants.LOCATION_HELPER_TAG, "No location result available.");
                     return;
                 }
 
@@ -74,7 +71,7 @@ public class LocationHelper {
                     lastLocation = location; // 마지막 위치 업데이트
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
-                    Log.v(TAG, "LOCATION_UPDATE: " + latitude + ", " + longitude);
+                    Log.v(Constants.LOCATION_HELPER_TAG, "LOCATION_UPDATE: " + latitude + ", " + longitude);
                     sendLocationToServer(latitude, longitude);
 
                     // 위치 정보를 받은 후, 위치 업데이트를 중지합니다.
@@ -87,7 +84,7 @@ public class LocationHelper {
     public void sendLocationToServer(double latitude, double longitude) {
         String token = App.prefs.getToken();
         if (token == null || token.isEmpty()) {
-            Log.e(TAG, "Token is null or empty, cannot send location to server.");
+            Log.e(Constants.LOCATION_HELPER_TAG, "Token is null or empty, cannot send location to server.");
             return;
         }
 
@@ -99,18 +96,18 @@ public class LocationHelper {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Log.v(TAG, "Location successfully sent to server.");
+                    Log.v(Constants.LOCATION_HELPER_TAG, "Location successfully sent to server.");
                 } else {
-                    Log.e(TAG, "Failed to send location to server: " + response.message());
+                    Log.e(Constants.LOCATION_HELPER_TAG, "Failed to send location to server: " + response.message());
                     if (response.code() == 401) {
-                        Log.d(TAG, "Token may be expired. Refreshing token.");
+                        Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Log.e(TAG, "Error sending location to server", t);
+                Log.e(Constants.LOCATION_HELPER_TAG, "Error sending location to server", t);
             }
         });
     }
@@ -119,7 +116,7 @@ public class LocationHelper {
         if (lastLocation != null) {
             return lastLocation.getLatitude();
         } else {
-            Log.e(TAG, "No last known location available.");
+            Log.e(Constants.LOCATION_HELPER_TAG, "No last known location available.");
             return 0.0;
         }
     }
@@ -128,7 +125,7 @@ public class LocationHelper {
         if (lastLocation != null) {
             return lastLocation.getLongitude();
         } else {
-            Log.e(TAG, "No last known location available.");
+            Log.e(Constants.LOCATION_HELPER_TAG, "No last known location available.");
             return 0.0;
         }
     }
@@ -136,7 +133,7 @@ public class LocationHelper {
     public void stopLocationUpdates() {
         if (fusedLocationProviderClient != null && locationCallback != null) {
             fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-            Log.d(TAG, "Location updates stopped.");
+            Log.d(Constants.LOCATION_HELPER_TAG, "Location updates stopped.");
         }
     }
 }

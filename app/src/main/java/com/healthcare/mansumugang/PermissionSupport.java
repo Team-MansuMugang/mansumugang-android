@@ -20,8 +20,6 @@ public class PermissionSupport {
     private List<String> permissions;
 
     // 권한 요청 코드
-    private static final int MULTIPLE_PERMISSIONS = 1023;
-    private static final int BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 1024;
 
     public PermissionSupport(Activity activity, Context context) {
         this.activity = activity;
@@ -78,7 +76,7 @@ public class PermissionSupport {
             }
         }
         if (!deniedPermissions.isEmpty()) {
-            ActivityCompat.requestPermissions(activity, deniedPermissions.toArray(new String[0]), MULTIPLE_PERMISSIONS);
+            ActivityCompat.requestPermissions(activity, deniedPermissions.toArray(new String[0]), Constants.MULTIPLE_PERMISSIONS);
         }
     }
 
@@ -91,13 +89,13 @@ public class PermissionSupport {
             ActivityCompat.requestPermissions(
                     activity,
                     new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
-                    BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
+                    Constants.BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE
             );
         }
     }
 
     public boolean permissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == MULTIPLE_PERMISSIONS) {
+        if (requestCode == Constants.MULTIPLE_PERMISSIONS) {
             boolean allPermissionsGranted = true;
             for (int result : grantResults) {
                 if (result == PackageManager.PERMISSION_DENIED) {

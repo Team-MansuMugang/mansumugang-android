@@ -23,12 +23,8 @@ import retrofit2.Response;
 
 public class AlarmLocationScheduler {
 
-    private static final String TAG = "AlarmLocationScheduler"; // 로그를 찍을 때 사용할 태그
     private Context context; // 컨텍스트 객체
     private LocationHelper locationHelper; // 위치를 가져오는 도우미 객체
-
-    private static final long REFRESH_INTERVAL = 60000L; // 알람 반복 간격, 60초
-    private static final int ALARM_REQUEST_CODE = 0; // 알람 요청 코드
 
     public AlarmLocationScheduler(Context context) {
         this.context = context;
@@ -44,7 +40,7 @@ public class AlarmLocationScheduler {
         intent.putExtra("date", date);
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                context, Constants.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
         long triggerTime = SystemClock.elapsedRealtime();
@@ -56,14 +52,14 @@ public class AlarmLocationScheduler {
                         alarmManager.setRepeating(
                                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
                                 triggerTime,
-                                REFRESH_INTERVAL,
+                                Constants.REFRESH_INTERVAL,
                                 pendingIntent
                         );
                     } catch (SecurityException e) {
-                        Log.e(TAG, "Permission denied for scheduling exact alarms: " + e.getMessage());
+                        Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Permission denied for scheduling exact alarms: " + e.getMessage());
                     }
                 } else {
-                    Log.e(TAG, "Cannot schedule exact alarms, permission not granted.");
+                    Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Cannot schedule exact alarms, permission not granted.");
                     // 권한을 요청하기 위한 안내 또는 처리
                     Intent exactAlarmIntent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
                     context.startActivity(exactAlarmIntent);
@@ -72,7 +68,7 @@ public class AlarmLocationScheduler {
                 alarmManager.setRepeating(
                         AlarmManager.ELAPSED_REALTIME_WAKEUP,
                         triggerTime,
-                        REFRESH_INTERVAL,
+                        Constants.REFRESH_INTERVAL,
                         pendingIntent
                 );
             }
@@ -87,7 +83,7 @@ public class AlarmLocationScheduler {
 
         // 알람 설정 시와 동일한 PendingIntent 생성
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                context, Constants.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
         System.out.println("stop scheduling");
@@ -116,7 +112,7 @@ public class AlarmLocationScheduler {
                     fetchScheduleData(currentDate, currentLatitude, currentLongitude);
                 }
             } else {
-                Log.e(TAG, "Current location is not available.");
+                Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Current location is not available.");
             }
         }, 5000); // 5초 대기
     }
@@ -133,13 +129,13 @@ public class AlarmLocationScheduler {
                     List<ScheduleResponse.Schedule> schedules = response.body().getMedicineSchedules();
                     processSchedules(schedules, response.body(), currentLatitude, currentLongitude);
                 } else {
-                    Log.e(TAG, "Response unsuccessful or empty: " + response.message());
+                    Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Response unsuccessful or empty: " + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<ScheduleResponse> call, Throwable t) {
-                Log.e(TAG, "API call failed: " + t.getMessage());
+                Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "API call failed: " + t.getMessage());
             }
         });
     }
@@ -150,7 +146,7 @@ public class AlarmLocationScheduler {
             List<String> medicineNamesIn = new ArrayList<>();
 
             if (isPastTime(scheduleResponse.getDate(), schedule.getTime())) {
-                Log.i(TAG, "Skipping past schedule: " + scheduleResponse.getDate() + " Day " + schedule.getTime());
+                Log.i(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Skipping past schedule: " + scheduleResponse.getDate() + " Day " + schedule.getTime());
                 continue;
             }
 
@@ -177,14 +173,14 @@ public class AlarmLocationScheduler {
                 if (currentTime.before(oneHourBefore) && !currentTime.after(oneHourAfter)) {
                     double latitude = schedule.getHospital().getLatitude();
                     double longitude = schedule.getHospital().getLongitude();
-                    Log.d(TAG, "Hospital location - Lat: " + latitude + ", Lon: " + longitude);
+                    Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Hospital location - Lat: " + latitude + ", Lon: " + longitude);
 
                     float[] results = new float[1];
                     Location.distanceBetween(currentLatitude, currentLongitude, latitude, longitude, results);
                     float distanceInMeters = results[0];
 
                     if (distanceInMeters <= 1000) {
-                        Log.d(TAG, "병원이 1km 내에 있습니다.");
+                        Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "병원이 1km 내에 있습니다.");
                         if(!schedule.getHospital().isHospitalStatus()){
                             System.out.println("sendBroadcast");
                             handleTakingButtonClick(schedule.getHospital().getHospitalId(),scheduleResponse.getDate());
@@ -192,10 +188,10 @@ public class AlarmLocationScheduler {
                         }
                         // 추가 로직을 여기에 추가 (예: 알림 보내기, 특정 작업 수행 등)
                     } else {
-                        Log.d(TAG, "병원이 1km 밖에 있습니다.");
+                        Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "병원이 1km 밖에 있습니다.");
                     }
                 } else {
-                    Log.d(TAG, "Current time is not within the 1-hour range of the scheduled time.");
+                    Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Current time is not within the 1-hour range of the scheduled time.");
                 }
 
                 medicineNamesIn.add(hospitalName);
@@ -225,13 +221,13 @@ public class AlarmLocationScheduler {
                 if (response.isSuccessful()) {
                     System.out.println("complete");
                 } else {
-                    Log.e(TAG, "API 호출 실패: " + response.message());
+                    Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "API 호출 실패: " + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Log.e(TAG, "API 호출 실패", t);
+                Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "API 호출 실패", t);
             }
         });
     }
@@ -242,7 +238,7 @@ public class AlarmLocationScheduler {
         try {
             scheduleTime.setTime(timeFormat.parse(timeStr));
         } catch (ParseException e) {
-            Log.e(TAG, "Failed to parse schedule time: " + e.getMessage());
+            Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Failed to parse schedule time: " + e.getMessage());
             e.printStackTrace();
         }
         return scheduleTime;

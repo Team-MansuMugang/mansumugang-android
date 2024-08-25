@@ -18,7 +18,6 @@ import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -26,7 +25,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -46,7 +43,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Preview extends Thread {
-    private final static String TAG = "Preview";
 
     private Size mPreviewSize;
     private Context mContext;
@@ -109,7 +105,7 @@ public class Preview extends Thread {
                 }
             }
         } catch (CameraAccessException e) {
-            Log.e(TAG, "Error accessing camera", e);
+            Log.e(Constants.PREVIEW, "Error accessing camera", e);
         }
         return null;
     }
@@ -119,7 +115,7 @@ public class Preview extends Thread {
         try {
             mCameraId = getBackFacingCameraId(manager);
             if (mCameraId == null) {
-                Log.e(TAG, "No back-facing camera found");
+                Log.e(Constants.PREVIEW, "No back-facing camera found");
                 return;
             }
 
@@ -130,12 +126,12 @@ public class Preview extends Thread {
             if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA)
                     == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions((Activity) mContext,
-                        new String[]{Manifest.permission.CAMERA}, CameraActivity.REQUEST_CAMERA);
+                        new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
             } else {
                 manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
             }
         } catch (CameraAccessException e) {
-            Log.e(TAG, "Error opening camera", e);
+            Log.e(Constants.PREVIEW, "Error opening camera", e);
         }
     }
 
@@ -170,24 +166,24 @@ public class Preview extends Thread {
 
         @Override
         public void onDisconnected(CameraDevice camera) {
-            Log.e(TAG, "Camera disconnected");
+            Log.e(Constants.PREVIEW, "Camera disconnected");
         }
 
         @Override
         public void onError(CameraDevice camera, int error) {
-            Log.e(TAG, "Camera error: " + error);
+            Log.e(Constants.PREVIEW, "Camera error: " + error);
         }
     };
 
     private void startPreview() {
         if (mCameraDevice == null || !mTextureView.isAvailable() || mPreviewSize == null) {
-            Log.e(TAG, "startPreview fail, return");
+            Log.e(Constants.PREVIEW, "startPreview fail, return");
             return;
         }
 
         SurfaceTexture texture = mTextureView.getSurfaceTexture();
         if (texture == null) {
-            Log.e(TAG, "SurfaceTexture is null");
+            Log.e(Constants.PREVIEW, "SurfaceTexture is null");
             return;
         }
 
@@ -211,13 +207,13 @@ public class Preview extends Thread {
                 }
             }, mBackgroundHandler);
         } catch (CameraAccessException e) {
-            Log.e(TAG, "Error creating capture session", e);
+            Log.e(Constants.PREVIEW, "Error creating capture session", e);
         }
     }
 
     private void updatePreview() {
         if (mCameraDevice == null) {
-            Log.e(TAG, "updatePreview error: CameraDevice is null");
+            Log.e(Constants.PREVIEW, "updatePreview error: CameraDevice is null");
             return;
         }
 
@@ -230,7 +226,7 @@ public class Preview extends Thread {
         try {
             mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, backgroundHandler);
         } catch (CameraAccessException e) {
-            Log.e(TAG, "Error updating preview", e);
+            Log.e(Constants.PREVIEW, "Error updating preview", e);
         }
     }
 
@@ -238,7 +234,7 @@ public class Preview extends Thread {
 
     private void takePicture() {
         if (mCameraDevice == null) {
-            Log.e(TAG, "CameraDevice is null");
+            Log.e(Constants.PREVIEW, "CameraDevice is null");
             return;
         }
 
@@ -309,12 +305,12 @@ public class Preview extends Thread {
                                         }
                                     });
                                 } else {
-                                    Log.e(TAG, "Image file is null or does not exist");
+                                    Log.e(Constants.PREVIEW, "Image file is null or does not exist");
                                 }
                             }
                         }, captureHandler);
                     } catch (CameraAccessException e) {
-                        Log.e(TAG, "Error capturing picture", e);
+                        Log.e(Constants.PREVIEW, "Error capturing picture", e);
                     }
                 }
 
@@ -324,7 +320,7 @@ public class Preview extends Thread {
                 }
             }, captureHandler);
         } catch (CameraAccessException e) {
-            Log.e(TAG, "Error setting up image reader", e);
+            Log.e(Constants.PREVIEW, "Error setting up image reader", e);
         }
     }
 
@@ -341,7 +337,7 @@ public class Preview extends Thread {
 
             save(bytes);
         } catch (Exception e) {
-            Log.e(TAG, "Error saving image", e);
+            Log.e(Constants.PREVIEW, "Error saving image", e);
         } finally {
             if (image != null) {
                 image.close();
@@ -354,7 +350,7 @@ public class Preview extends Thread {
         try (OutputStream output = new FileOutputStream(imageFile)) {
             output.write(bytes);
         } catch (IOException e) {
-            Log.e(TAG, "Error saving picture", e);
+            Log.e(Constants.PREVIEW, "Error saving picture", e);
         }
     }
 

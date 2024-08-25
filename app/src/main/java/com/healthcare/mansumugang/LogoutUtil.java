@@ -29,7 +29,6 @@ public class LogoutUtil {
         // 저장된 토큰 및 사용자 정보 삭제
         App.prefs.setToken(null);
         App.prefs.setRefreshToken(null);
-        App.prefs.setUserType(null);
 
 
         // 알람 스케줄러 중지
