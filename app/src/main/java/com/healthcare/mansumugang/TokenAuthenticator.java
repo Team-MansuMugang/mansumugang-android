@@ -14,16 +14,17 @@ import retrofit2.Call;
 import retrofit2.HttpException;
 
 /**
- * TokenAuthenticator 클래스는 토큰 갱신을 처리하는 OkHttp Authenticator입니다.
+ * TokenAuthenticator 클래스는 OkHttp의 Authenticator를 구현하여
+ * 인증 실패 시 새로운 토큰을 사용하여 요청을 재시도합니다.
  */
 public class TokenAuthenticator implements Authenticator {
 
-    private Context context;
-    private boolean isTokenRefreshing = false;
-    private AlarmLocationScheduler alarmLocationScheduler;
+    private Context context; // 애플리케이션 컨텍스트
+    private boolean isTokenRefreshing = false; // 토큰 갱신 여부를 나타내는 플래그
+    private AlarmLocationScheduler alarmLocationScheduler; // 알람 위치 스케줄러 객체
 
     /**
-     * TokenAuthenticator 생성자
+     * TokenAuthenticator의 생성자입니다.
      *
      * @param context 애플리케이션 컨텍스트
      */
@@ -44,7 +45,7 @@ public class TokenAuthenticator implements Authenticator {
     public Request authenticate(Route route, Response response) throws IOException {
         Log.d(Constants.TOKEN_AUTHENTICATOR, "authenticate() called");
 
-        // 이미 토큰 갱신이 시도되었는지 확인하여 무한 루프 방지
+        // 이미 토큰 갱신이 시도 중인지 확인하여 무한 루프 방지
         if (isTokenRefreshing) {
             Log.d(Constants.TOKEN_AUTHENTICATOR, "Token is already refreshing. Skipping further attempts.");
             return null;
@@ -53,7 +54,7 @@ public class TokenAuthenticator implements Authenticator {
         String accessToken = App.prefs.getToken();       // 현재 액세스 토큰
         String refreshToken = App.prefs.getRefreshToken(); // 리프레시 토큰
 
-        // 인증 실패 코드 확인
+        // 인증 실패 코드 확인 (401 또는 403)
         if (response.code() == 401 || response.code() == 403) {
             // 이미 토큰 갱신 시도를 했는지 확인하여 무한 루프 방지
             if (response.request().header("Authorization-refresh") != null && response.request().header("Authorization-refresh").startsWith("Bearer " + refreshToken)) {
@@ -71,6 +72,7 @@ public class TokenAuthenticator implements Authenticator {
                 retrofit2.Response<RefreshTokenResponse> tokenResponse = call.execute();
 
                 if (tokenResponse.isSuccessful()) {
+                    // 토큰 갱신 성공
                     RefreshTokenResponse newToken = tokenResponse.body();
 
                     if (newToken != null) {
@@ -84,10 +86,11 @@ public class TokenAuthenticator implements Authenticator {
                         Log.e(Constants.TOKEN_AUTHENTICATOR, "TokenResponse is null");
                     }
                 } else {
+                    // 토큰 갱신 실패 처리
                     Log.e(Constants.TOKEN_AUTHENTICATOR, "토큰 갱신 실패: " + tokenResponse.message());
 
                     if (tokenResponse.code() == 401) {
-                        // NoSuchRefreshTokenError 발생 시 로그아웃 처리
+                        // 리프레시 토큰이 유효하지 않은 경우 로그아웃 처리
                         String errorBody = tokenResponse.errorBody() != null ? tokenResponse.errorBody().string() : "";
                         if (errorBody.contains("NoSuchRefreshTokenError")) {
                             Log.e(Constants.TOKEN_AUTHENTICATOR, "Refresh token is invalid. Logging out...");
@@ -106,7 +109,7 @@ public class TokenAuthenticator implements Authenticator {
             } catch (Exception e) {
                 Log.e(Constants.TOKEN_AUTHENTICATOR, "Exception: " + e.getMessage());
             } finally {
-                isTokenRefreshing = false;
+                isTokenRefreshing = false; // 토큰 갱신 플래그 리셋
             }
         }
 

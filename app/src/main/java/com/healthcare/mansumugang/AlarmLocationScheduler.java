@@ -29,13 +29,15 @@ import retrofit2.Response;
 public class AlarmLocationScheduler {
 
     private Context context; // 컨텍스트 객체
-    private LocationHelper locationHelper; // 위치를 가져오는 도우미 객체
+    private LocationHelper locationHelper; // 위치 정보를 가져오는 도우미 객체
 
+    // 생성자: AlarmLocationScheduler 객체를 초기화
     public AlarmLocationScheduler(Context context) {
         this.context = context;
         locationHelper = new LocationHelper(context); // 위치 정보를 가져오는 헬퍼 클래스 초기화
     }
 
+    // 알람 스케줄링 시작
     public void startScheduling(String date) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -52,9 +54,10 @@ public class AlarmLocationScheduler {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (alarmManager.canScheduleExactAlarms()) {
                     try {
+                        // 반복 알람 설정
                         alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, Constants.REFRESH_INTERVAL, pendingIntent);
                     } catch (SecurityException e) {
-                        Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Permission denied for scheduling exact alarms: " + e.getMessage());
+                        Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Exact alarms scheduling permission denied: " + e.getMessage());
                     }
                 } else {
                     Log.e(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Cannot schedule exact alarms, permission not granted.");
@@ -63,11 +66,13 @@ public class AlarmLocationScheduler {
                     context.startActivity(exactAlarmIntent);
                 }
             } else {
+                // 안드로이드 버전이 S 이하인 경우 반복 알람 설정
                 alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, Constants.REFRESH_INTERVAL, pendingIntent);
             }
         }
     }
 
+    // 알람 스케줄링 중지
     public void stopScheduling() {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
@@ -80,6 +85,7 @@ public class AlarmLocationScheduler {
         System.out.println("stop scheduling");
 
         if (alarmManager != null) {
+            // 알람 취소
             alarmManager.cancel(pendingIntent);
             System.out.println("AlarmManager cancelled successfully");
         } else {
@@ -87,10 +93,9 @@ public class AlarmLocationScheduler {
         }
     }
 
-
+    // 위치를 가져오고 스케줄 데이터를 가져오는 메서드
     public void fetchLocationAndSchedule(String date) {
         // 위치 정보를 한 번만 가져옵니다
-
         locationHelper.fetchLocationOnce();
 
         new android.os.Handler().postDelayed(() -> {
@@ -108,6 +113,7 @@ public class AlarmLocationScheduler {
         }, 5000); // 5초 대기
     }
 
+    // 스케줄 데이터를 가져와 처리하는 메서드
     private void fetchScheduleData(String date, double currentLatitude, double currentLongitude) {
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         String token = App.prefs.getToken();
@@ -122,6 +128,7 @@ public class AlarmLocationScheduler {
                 } else if (response.code() == 401) {
                     Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
                 } else {
+                    // 오류 메시지 처리
                     String errorMessage = "API 호출 실패";
                     if (response.errorBody() != null) {
                         try {
@@ -145,6 +152,7 @@ public class AlarmLocationScheduler {
         });
     }
 
+    // 스케줄을 처리하는 메서드
     private void processSchedules(List<ScheduleResponse.Schedule> schedules, ScheduleResponse scheduleResponse, double currentLatitude, double currentLongitude) {
         List<List> medicineNames = new ArrayList<>();
         for (ScheduleResponse.Schedule schedule : schedules) {
@@ -173,7 +181,7 @@ public class AlarmLocationScheduler {
                 Calendar oneHourAfter = (Calendar) scheduleTime.clone();
                 oneHourAfter.add(Calendar.HOUR_OF_DAY, 1);
 
-
+                // 현재 시간이 스케줄 시간의 1시간 전과 1시간 후 사이에 있는지 확인
                 if (currentTime.before(oneHourBefore) && !currentTime.after(oneHourAfter)) {
                     double latitude = schedule.getHospital().getLatitude();
                     double longitude = schedule.getHospital().getLongitude();
@@ -208,10 +216,12 @@ public class AlarmLocationScheduler {
             medicineNames.add(medicineNamesIn);
         }
 
+        // 기존 알람 취소 및 새 알람 설정
         AlarmScheduler.cancelAlarms(context, medicineNames);
         AlarmScheduler.scheduleAlarms(context, medicineNames);
     }
 
+    // 약 복용 버튼 클릭 처리
     public void handleTakingButtonClick(Long hospitalId, String date) {
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         String token = App.prefs.getToken();
@@ -227,6 +237,7 @@ public class AlarmLocationScheduler {
                 } else if (response.code() == 401) {
                     Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
                 } else {
+                    // 오류 메시지 처리
                     String errorMessage = "API 호출 실패";
                     if (response.errorBody() != null) {
                         try {
@@ -250,6 +261,7 @@ public class AlarmLocationScheduler {
         });
     }
 
+    // 스케줄 시간 문자열을 Calendar 객체로 변환
     private Calendar getScheduleTime(String timeStr) {
         Calendar scheduleTime = Calendar.getInstance();
         SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
@@ -262,6 +274,7 @@ public class AlarmLocationScheduler {
         return scheduleTime;
     }
 
+    // 현재 시간이 스케줄된 시간 이전인지 확인
     private boolean isPastTime(String date, String time) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         String dateTimeString = date + " " + time;
@@ -278,6 +291,7 @@ public class AlarmLocationScheduler {
         }
     }
 
+    // 시작 날짜로부터 특정 오프셋을 더한 날짜를 반환
     public String getNextDate(String startDate, int offset) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Calendar calendar = Calendar.getInstance();

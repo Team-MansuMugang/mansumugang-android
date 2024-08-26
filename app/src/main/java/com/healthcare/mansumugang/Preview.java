@@ -45,21 +45,25 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Preview 클래스는 카메라의 실시간 미리보기와 사진 촬영을 관리합니다.
+ * 이 클래스는 카메라 프리뷰를 설정하고, 사진을 촬영하며, 촬영된 사진을 저장하고 서버에 업로드하는 기능을 포함합니다.
+ */
 public class Preview extends Thread {
 
-    private Size mPreviewSize;
-    private Context mContext;
-    private CameraDevice mCameraDevice;
-    private CaptureRequest.Builder mPreviewBuilder;
-    private CameraCaptureSession mPreviewSession;
-    private TextureView mTextureView;
-    private String mCameraId = "0";
-    private Button mCameraCaptureButton;
-    private HandlerThread mBackgroundThread;
-    private Handler mBackgroundHandler;
-    private File imageFile;
+    private Size mPreviewSize; // 프리뷰의 크기
+    private Context mContext; // 애플리케이션 컨텍스트
+    private CameraDevice mCameraDevice; // 카메라 디바이스
+    private CaptureRequest.Builder mPreviewBuilder; // 카메라 프리뷰 설정 빌더
+    private CameraCaptureSession mPreviewSession; // 카메라 캡처 세션
+    private TextureView mTextureView; // 텍스처 뷰
+    private String mCameraId = "0"; // 카메라 ID (기본값: 0)
+    private Button mCameraCaptureButton; // 카메라 촬영 버튼
+    private HandlerThread mBackgroundThread; // 백그라운드 작업을 위한 핸들러 스레드
+    private Handler mBackgroundHandler; // 백그라운드 핸들러
+    private File imageFile; // 저장할 이미지 파일
 
-
+    // 카메라의 회전 방향에 따른 각도 매핑
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray(4);
 
     static {
@@ -69,6 +73,14 @@ public class Preview extends Thread {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
+    /**
+     * Preview 클래스의 생성자
+     *
+     * @param context       애플리케이션 컨텍스트
+     * @param textureView   카메라 프리뷰를 표시할 텍스처 뷰
+     * @param captureButton 사진 촬영 버튼
+     *                      생성자에서는 텍스처 뷰의 서피스 텍스처 리스너를 설정하고, 사진 촬영 버튼의 클릭 리스너를 설정합니다.
+     */
     public Preview(Context context, TextureView textureView, Button captureButton) {
         mContext = context;
         mTextureView = textureView;
@@ -77,15 +89,22 @@ public class Preview extends Thread {
 
         mCameraCaptureButton.setOnClickListener(v -> takePicture());
         startBackgroundThread();
-
     }
 
+    /**
+     * 백그라운드 스레드를 시작합니다.
+     * 백그라운드 스레드에서 카메라 관련 작업을 처리합니다.
+     */
     private void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("CameraBackground");
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
     }
 
+    /**
+     * 백그라운드 스레드를 중지합니다.
+     * 백그라운드 스레드를 안전하게 종료하고, 관련 핸들러를 null로 설정합니다.
+     */
     private void stopBackgroundThread() {
         if (mBackgroundThread != null) {
             mBackgroundThread.quitSafely();
@@ -99,6 +118,13 @@ public class Preview extends Thread {
         }
     }
 
+    /**
+     * 후면 카메라의 ID를 가져옵니다.
+     *
+     * @param cManager 카메라 관리자
+     * @return 후면 카메라의 ID 또는 null (후면 카메라가 없을 경우)
+     * 카메라 관리자에서 후면 카메라를 검색하고, 후면 카메라의 ID를 반환합니다.
+     */
     private String getBackFacingCameraId(CameraManager cManager) {
         try {
             for (String cameraId : cManager.getCameraIdList()) {
@@ -114,6 +140,10 @@ public class Preview extends Thread {
         return null;
     }
 
+    /**
+     * 카메라를 열고 프리뷰를 시작합니다.
+     * 카메라 ID를 설정하고 카메라 권한을 확인한 후 카메라를 열어 프리뷰를 시작합니다.
+     */
     public void openCamera() {
         CameraManager manager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
         try {
@@ -137,6 +167,9 @@ public class Preview extends Thread {
         }
     }
 
+    /**
+     * 텍스처 뷰의 서피스 텍스처 리스너
+     */
     private final TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
@@ -145,20 +178,23 @@ public class Preview extends Thread {
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-            // Handle surface texture size changes if needed
+            // 서피스 텍스처 크기 변경 시 처리 (필요할 경우)
         }
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            return true; // Return true if the SurfaceTexture is being destroyed
+            return true; // 서피스 텍스처가 파괴될 때 true를 반환
         }
 
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-            // Handle updates if needed
+            // 서피스 텍스처 업데이트 시 처리 (필요할 경우)
         }
     };
 
+    /**
+     * 카메라 디바이스 상태 콜백
+     */
     private final CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(CameraDevice camera) {
@@ -177,6 +213,10 @@ public class Preview extends Thread {
         }
     };
 
+    /**
+     * 카메라 프리뷰를 시작합니다.
+     * 카메라 디바이스와 텍스처 뷰가 준비되었는지 확인한 후, 프리뷰를 설정하고 시작합니다.
+     */
     private void startPreview() {
         if (mCameraDevice == null || !mTextureView.isAvailable() || mPreviewSize == null) {
             Log.e(Constants.PREVIEW, "startPreview fail, return");
@@ -213,6 +253,10 @@ public class Preview extends Thread {
         }
     }
 
+    /**
+     * 프리뷰를 업데이트합니다.
+     * 카메라 프리뷰의 설정을 업데이트하여 실시간으로 프리뷰를 계속 보여줍니다.
+     */
     private void updatePreview() {
         if (mCameraDevice == null) {
             Log.e(Constants.PREVIEW, "updatePreview error: CameraDevice is null");
@@ -234,6 +278,10 @@ public class Preview extends Thread {
 
     private final Runnable mDelayPreviewRunnable = this::startPreview;
 
+    /**
+     * 사진을 촬영합니다.
+     * 카메라 디바이스가 준비된 상태에서 사진을 촬영하고, 촬영된 사진을 저장하고 서버에 업로드합니다.
+     */
     private void takePicture() {
         if (mCameraDevice == null) {
             Log.e(Constants.PREVIEW, "CameraDevice is null");
@@ -320,7 +368,6 @@ public class Preview extends Thread {
                                         @Override
                                         public void onFailure(Call<Void> call, Throwable t) {
                                             // 실패 응답 처리
-
                                         }
                                     });
                                 } else {
@@ -343,6 +390,10 @@ public class Preview extends Thread {
         }
     }
 
+    /**
+     * 이미지가 사용 가능할 때 호출됩니다.
+     * 이미지를 읽어 파일로 저장합니다.
+     */
     private final ImageReader.OnImageAvailableListener readerListener = reader -> {
         Image image = null;
         try {
@@ -364,6 +415,12 @@ public class Preview extends Thread {
         }
     };
 
+    /**
+     * 바이트 배열로부터 이미지를 저장합니다.
+     *
+     * @param bytes 이미지 데이터 바이트 배열
+     *              바이트 배열을 사용하여 외부 저장소에 이미지를 저장합니다.
+     */
     private void save(byte[] bytes) {
         imageFile = new File(Environment.getExternalStorageDirectory() + "/DCIM/", new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".jpg");
         try (OutputStream output = new FileOutputStream(imageFile)) {
@@ -373,6 +430,13 @@ public class Preview extends Thread {
         }
     }
 
+    /**
+     * 현재 화면의 회전 방향을 가져옵니다.
+     *
+     * @param context 애플리케이션 컨텍스트
+     * @return 회전 방향에 따른 이미지 회전 각도
+     * 현재 화면의 회전 방향에 따라 카메라 촬영 이미지의 회전 각도를 계산합니다.
+     */
     private int getOrientation(Context context) {
         int rotation = ((Activity) context).getWindowManager().getDefaultDisplay().getRotation();
         return ORIENTATIONS.get(rotation);

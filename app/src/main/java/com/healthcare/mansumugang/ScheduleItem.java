@@ -20,43 +20,48 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-
+/**
+ * ScheduleItem 클래스는 일정 항목을 생성하고 처리하는데 필요한 메소드를 제공합니다.
+ */
 public class ScheduleItem {
 
     /**
      * 스케줄 뷰를 생성하여 반환합니다.
      *
-     * @param context           Context
-     * @param layoutBox         LinearLayout
-     * @param schedule          ScheduleResponse.Schedule
-     * @param imageApiUrlPrefix String
-     * @return View
+     * @param context           컨텍스트
+     * @param layoutBox         일정 항목을 추가할 레이아웃
+     * @param schedule          스케줄 데이터
+     * @param imageApiUrlPrefix 이미지 API URL 접두사
+     * @param date              일정 날짜
+     * @return 생성된 스케줄 뷰
      */
     public static View createScheduleView(Context context, LinearLayout layoutBox, ScheduleResponse.Schedule schedule, String imageApiUrlPrefix, String date) {
+        String scheduleTimeStr = schedule.getTime(); // 일정 시간 문자열
 
-        String scheduleTimeStr = schedule.getTime();
-
+        // 스케줄 항목의 뷰를 생성합니다.
         View scheduleView = LayoutInflater.from(context).inflate(R.layout.schedule_item, layoutBox, false);
         TextView timeView = scheduleView.findViewById(R.id.timeText);
         timeView.setText(" " + scheduleTimeStr);
 
-        // layoutBox에 scheduleView를 추가
+        // 레이아웃 박스에 생성된 스케줄 뷰를 추가합니다.
         layoutBox.addView(scheduleView);
 
-        // scheduleView 내에서 additionalBox를 찾음
+        // 추가 정보 박스를 찾습니다.
         LinearLayout additionalBox = scheduleView.findViewById(R.id.additionalBox);
         TextView takingButton = scheduleView.findViewById(R.id.TakingButtonAct);
 
         List<Long> medicineIds = new ArrayList<>();
 
         if (schedule.getHospital() != null) {
-            // 병원 정보가 있는 경우, 병원 뷰를 생성하여 추가
+            // 병원 정보가 있는 경우, 병원 뷰를 생성하여 추가합니다.
             View hospitalView = createHospitalView(context, schedule.getHospital());
             additionalBox.addView(hospitalView);
-            boolean pastTime = inTimeRange(date, scheduleTimeStr);
 
+            // 현재 시간이 스케줄 시간 범위 내에 있는지 확인합니다.
+            boolean pastTime = inTimeRange(date, scheduleTimeStr);
             setTakingHospitalButtonAttributes(pastTime, takingButton, schedule.getHospital().isHospitalStatus());
-            // TakingButton 클릭 리스너 설정
+
+            // TakingButton 클릭 리스너를 설정합니다.
             takingButton.setOnClickListener(v -> {
                 if (context instanceof ScheduleActivity) {
                     ((ScheduleActivity) context).handleTakingButtonClick(schedule.getHospital().getHospitalId(), date);
@@ -64,12 +69,12 @@ public class ScheduleItem {
             });
         }
 
-        // additionalBox에 약물 아이템 추가
+        // 약물 아이템을 추가합니다.
         for (ScheduleResponse.Schedule.Medicine medicine : schedule.getMedicines()) {
             View medicineView = createMedicineView(context, medicine, imageApiUrlPrefix);
             additionalBox.addView(medicineView);
 
-            // medicineId를 리스트에 추가
+            // 약물 ID를 리스트에 추가합니다.
             medicineIds.add(medicine.getMedicineId());
         }
 
@@ -77,6 +82,8 @@ public class ScheduleItem {
         if (!medicineIds.isEmpty()) {
             ScheduleResponse.Schedule.Medicine firstMedicine = schedule.getMedicines().get(0);
             setTakingMeicineButtonAttributes(context, takingButton, firstMedicine);
+
+            // TakingButton 클릭 리스너를 설정합니다.
             takingButton.setOnClickListener(v -> {
                 if (context instanceof ScheduleActivity) {
                     ((ScheduleActivity) context).handleTakingButtonClick(medicineIds, schedule.getTime(), date);
@@ -84,12 +91,18 @@ public class ScheduleItem {
             });
         }
 
-
         return scheduleView;
     }
 
-
+    /**
+     * 병원 뷰를 생성하여 반환합니다.
+     *
+     * @param context  컨텍스트
+     * @param hospital 병원 데이터
+     * @return 생성된 병원 뷰
+     */
     private static View createHospitalView(Context context, ScheduleResponse.Schedule.Hospital hospital) {
+        // 병원 항목의 뷰를 생성합니다.
         View medicineView = LayoutInflater.from(context).inflate(R.layout.medicine_item, null, false);
 
         TextView medicineNameView = medicineView.findViewById(R.id.medicineName);
@@ -102,12 +115,14 @@ public class ScheduleItem {
         hospitalImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
         hospitalImage.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
         hospitalImage.getLayoutParams().height = 700;
+
         medicineNameView.setText(hospital.getHospitalName());
         hospitalNameView.setVisibility(View.GONE);
         hospitalLocationView.setVisibility(View.VISIBLE);
         hospitalLocationView.setText(hospital.getHospitalAddress());
         descriptionView.setText(hospital.getHospitalDescription());
 
+        // 병원 위치를 클릭하면 지도로 열리게 합니다.
         hospitalLocationView.setOnClickListener(v -> {
             double latitude = hospital.getLatitude();
             double longitude = hospital.getLongitude();
@@ -118,18 +133,18 @@ public class ScheduleItem {
         });
 
         return medicineView;
-
     }
 
     /**
      * 약물 뷰를 생성하여 반환합니다.
      *
-     * @param context           Context
-     * @param medicine          ScheduleResponse.Schedule.Medicine
-     * @param imageApiUrlPrefix String
-     * @return View
+     * @param context           컨텍스트
+     * @param medicine          약물 데이터
+     * @param imageApiUrlPrefix 이미지 API URL 접두사
+     * @return 생성된 약물 뷰
      */
     private static View createMedicineView(Context context, ScheduleResponse.Schedule.Medicine medicine, String imageApiUrlPrefix) {
+        // 약물 항목의 뷰를 생성합니다.
         View medicineView = LayoutInflater.from(context).inflate(R.layout.medicine_item, null, false);
 
         TextView medicineNameView = medicineView.findViewById(R.id.medicineName);
@@ -147,7 +162,6 @@ public class ScheduleItem {
             medicineImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
             medicineImage.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
             medicineImage.getLayoutParams().height = 500;
-
         } else {
             ViewGroup.LayoutParams params = medicineImage.getLayoutParams();
             medicineImage.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -156,9 +170,7 @@ public class ScheduleItem {
 
             medicineImage.setLayoutParams(params);
             String imageUrl = imageApiUrlPrefix + medicine.getMedicineImageName();
-            Glide.with(context).load(imageUrl)
-
-                    .into(medicineImage);
+            Glide.with(context).load(imageUrl).into(medicineImage);
         }
 
         return medicineView;
@@ -167,12 +179,11 @@ public class ScheduleItem {
     /**
      * 약물 상태에 따라 TakingButton의 속성을 설정합니다.
      *
-     * @param context      Context
-     * @param takingButton Button
-     * @param medicine     ScheduleResponse.Schedule.Medicine
+     * @param context      컨텍스트
+     * @param takingButton 버튼
+     * @param medicine     약물 데이터
      */
     private static void setTakingMeicineButtonAttributes(Context context, TextView takingButton, ScheduleResponse.Schedule.Medicine medicine) {
-
         if (medicine.isStatus().equals("WAITING")) {
             takingButton.setText("약을 드셨다면 여기를 눌러주세요");
             takingButton.setBackgroundResource(R.drawable.schedule_button_blue);
@@ -191,10 +202,16 @@ public class ScheduleItem {
         } else {
             takingButton.setText("약을 드셨어요!");
             takingButton.setBackgroundResource(R.drawable.schedule_button_green);
-
         }
     }
 
+    /**
+     * 병원 방문 버튼의 속성을 설정합니다.
+     *
+     * @param inTimeRange  일정 시간 범위 내에 있는지 여부
+     * @param takingButton 버튼
+     * @param status       병원 상태
+     */
     private static void setTakingHospitalButtonAttributes(Boolean inTimeRange, TextView takingButton, Boolean status) {
         if (status) {
             takingButton.setText("병원을 방문하셨어요!");
@@ -206,10 +223,16 @@ public class ScheduleItem {
             takingButton.setText("병원에 방문예정이 있습니다");
             takingButton.setBackgroundResource(R.drawable.schedule_button_gray);
             takingButton.setEnabled(false);
-
         }
     }
 
+    /**
+     * 주어진 날짜와 시간으로 일정이 현재 시간 범위 내에 있는지 확인합니다.
+     *
+     * @param date 일정 날짜
+     * @param time 일정 시간
+     * @return 일정이 현재 시간 범위 내에 있으면 true, 그렇지 않으면 false
+     */
     private static boolean inTimeRange(String date, String time) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         String dateTimeString = date + " " + time;
@@ -221,11 +244,6 @@ public class ScheduleItem {
             Calendar currentTime = Calendar.getInstance();
             Calendar oneHourAfter = (Calendar) scheduleCalendar.clone();
             oneHourAfter.add(Calendar.HOUR_OF_DAY, 1);
-            if (scheduleTime != null) {
-                oneHourAfter.setTime(scheduleTime);
-                oneHourAfter.add(Calendar.HOUR_OF_DAY, 1);
-
-            }
 
             return currentTime.after(scheduleCalendar) && currentTime.before(oneHourAfter);
         } catch (ParseException e) {

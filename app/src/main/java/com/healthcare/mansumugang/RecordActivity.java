@@ -35,37 +35,41 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RecordActivity extends AppCompatActivity {
-    private MediaRecorder mediaRecorder;
-    private boolean isRecording = false;
-    private String filePath = "";
-    private File audioFile;
+    private MediaRecorder mediaRecorder; // MediaRecorder 인스턴스
+    private boolean isRecording = false; // 녹음 상태 플래그
+    private String filePath = ""; // 녹음 파일 경로
+    private File audioFile; // 녹음 파일 객체
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recording);
+        setContentView(R.layout.activity_recording); // 레이아웃 설정
 
         // BottomNavigationView 설정
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.recording);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);
 
+        // 오디오 권한 체크 및 요청
         if (!hasPermissions()) {
             requestAudioPermissions();
         }
 
+        // 녹음 버튼 초기화
         initializeRecordingButtons();
     }
 
+    // 권한이 있는지 확인하는 메소드
     private boolean hasPermissions() {
         for (String permission : Constants.RECORD_PERMISSIONS) {
             if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
+                return false; // 권한이 없으면 false 반환
             }
         }
-        return true;
+        return true; // 모든 권한이 있으면 true 반환
     }
 
+    // 오디오 권한 요청 메소드
     private void requestAudioPermissions() {
         ActivityCompat.requestPermissions(this, Constants.RECORD_PERMISSIONS, Constants.REQUEST_RECORD_AUDIO_PERMISSION);
     }
@@ -75,10 +79,10 @@ public class RecordActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == Constants.REQUEST_RECORD_AUDIO_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initializeRecordingButtons();
+                initializeRecordingButtons(); // 권한이 허용되면 버튼 초기화
             } else {
                 Toast.makeText(this, "Permissions are required to record audio", Toast.LENGTH_SHORT).show();
-                finish();
+                finish(); // 권한이 거부되면 액티비티 종료
             }
         }
     }
@@ -87,48 +91,48 @@ public class RecordActivity extends AppCompatActivity {
      * 녹음 버튼들을 초기화하는 메소드입니다.
      */
     private void initializeRecordingButtons() {
-        Button recordButton = findViewById(R.id.recording_start_button);
-        ImageButton recordImageButton = findViewById(R.id.recording_button);
-        Button sendButton = findViewById(R.id.recording_save_button);
-        Button cancelButton = findViewById(R.id.recording_cancel_button);
+        Button recordButton = findViewById(R.id.recording_start_button); // 녹음 시작 버튼
+        ImageButton recordImageButton = findViewById(R.id.recording_button); // 이미지 버튼 (녹음 시작)
+        Button sendButton = findViewById(R.id.recording_save_button); // 녹음 저장 버튼
+        Button cancelButton = findViewById(R.id.recording_cancel_button); // 녹음 취소 버튼
 
-        // 녹음 시작 버튼에 클릭 리스너를 설정합니다.
+        // 녹음 시작 버튼 클릭 리스너 설정
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isRecording) {
-                    startRecording();
+                    startRecording(); // 녹음 시작
                 }
             }
         });
 
+        // 이미지 버튼 클릭 리스너 설정
         recordImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isRecording) {
-                    startRecording();
+                    startRecording(); // 녹음 시작
                 }
             }
         });
 
-        // 녹음 중지 버튼에 클릭 리스너를 설정합니다.
+        // 녹음 중지 버튼 클릭 리스너 설정
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isRecording) {
-                    stopRecording();
-                    convertAudio();
-
+                    stopRecording(); // 녹음 중지
+                    convertAudio(); // 오디오 파일 변환
                 }
             }
         });
 
-        // 녹음 취소 버튼에 클릭 리스너를 설정합니다.
+        // 녹음 취소 버튼 클릭 리스너 설정
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isRecording) {
-                    cancelRecording();
+                    cancelRecording(); // 녹음 취소
                 }
             }
         });
@@ -146,22 +150,22 @@ public class RecordActivity extends AppCompatActivity {
             Chronometer chronometer = findViewById(R.id.recording_time);
 
             chronometer.setBase(SystemClock.elapsedRealtime());
-            chronometer.start();
+            chronometer.start(); // 크로노미터 시작
 
             recordButton.setVisibility(View.GONE);
             recordingButtonBox.setVisibility(View.VISIBLE);
 
-            filePath = setupMediaRecorder();
+            filePath = setupMediaRecorder(); // MediaRecorder 설정
 
             mediaRecorder.prepare();
-            mediaRecorder.start();
+            mediaRecorder.start(); // 녹음 시작
             isRecording = true;
             chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
                 @Override
                 public void onChronometerTick(Chronometer chronometer) {
                     long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
 
-                    // 20분(1200초)에 해당하는 시간을 체크하여 녹음 중지 및 변환
+                    // 20분(1200초)에 해당하는 시간이 경과하면 녹음 중지 및 변환
                     if (elapsedMillis >= 20 * 60 * 1000) {  // 20분 = 20 * 60 * 1000 밀리초
                         if (isRecording) {
                             stopRecording();
@@ -171,9 +175,9 @@ public class RecordActivity extends AppCompatActivity {
                 }
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // 예외 처리
         }
-        return filePath;
+        return filePath; // 녹음 파일 경로 반환
     }
 
     /**
@@ -184,18 +188,17 @@ public class RecordActivity extends AppCompatActivity {
      */
     private String setupMediaRecorder() throws IOException {
         mediaRecorder = new MediaRecorder();
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        mediaRecorder.setAudioEncodingBitRate(48000);
-        mediaRecorder.setAudioSamplingRate(48000);
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC); // 마이크 소스 설정
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP); // 출력 포맷 설정
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC); // 오디오 인코더 설정
+        mediaRecorder.setAudioEncodingBitRate(48000); // 비트레이트 설정
+        mediaRecorder.setAudioSamplingRate(48000); // 샘플링 레이트 설정
 
-
-        String filePath = createFilePath() + createFileName() + ".3gp";
+        String filePath = createFilePath() + createFileName() + ".3gp"; // 파일 경로 생성
         System.out.println(filePath);
-        mediaRecorder.setOutputFile(filePath);
-        audioFile = new File(filePath);
-        return filePath;
+        mediaRecorder.setOutputFile(filePath); // 출력 파일 설정
+        audioFile = new File(filePath); // 파일 객체 생성
+        return filePath; // 파일 경로 반환
     }
 
     /**
@@ -204,7 +207,7 @@ public class RecordActivity extends AppCompatActivity {
      * @return 파일 경로
      */
     private String createFilePath() {
-        return getCacheDir().getAbsolutePath() + "/";
+        return getCacheDir().getAbsolutePath() + "/"; // 캐시 디렉토리 경로 반환
     }
 
     /**
@@ -213,7 +216,7 @@ public class RecordActivity extends AppCompatActivity {
      * @return 파일 이름
      */
     private String createFileName() {
-        return "REC_" + System.currentTimeMillis();
+        return "REC_" + System.currentTimeMillis(); // 현재 시간을 기반으로 파일 이름 생성
     }
 
     /**
@@ -226,17 +229,17 @@ public class RecordActivity extends AppCompatActivity {
                 LinearLayout recordingButtonBox = findViewById(R.id.recording_button_box);
                 Chronometer chronometer = findViewById(R.id.recording_time);
 
-                chronometer.stop();
+                chronometer.stop(); // 크로노미터 중지
                 chronometer.setBase(SystemClock.elapsedRealtime());
                 recordButton.setVisibility(View.VISIBLE);
                 recordingButtonBox.setVisibility(View.GONE);
 
-                mediaRecorder.stop();
+                mediaRecorder.stop(); // 녹음 중지
             } catch (RuntimeException e) {
-                e.printStackTrace();
+                e.printStackTrace(); // 예외 처리
             } finally {
-                mediaRecorder.reset();
-                mediaRecorder.release();
+                mediaRecorder.reset(); // MediaRecorder 리셋
+                mediaRecorder.release(); // MediaRecorder 해제
                 mediaRecorder = null;
                 isRecording = false;
             }
@@ -244,8 +247,8 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     private void cancelRecording() {
-        stopRecording();
-        if (audioFile.exists() && audioFile.delete()) {
+        stopRecording(); // 녹음 중지
+        if (audioFile.exists() && audioFile.delete()) { // 파일 존재 시 삭제
             Toast.makeText(this, "Recording cancelled and file deleted.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -262,8 +265,8 @@ public class RecordActivity extends AppCompatActivity {
                 // 성공적으로 변환된 파일을 사용할 수 있습니다.
                 String token = App.prefs.getToken();
                 System.out.println("Conversion successful: " + convertedFile.getAbsolutePath());
-                audioFile.delete();
-                uploadFile(token, convertedFile);
+                audioFile.delete(); // 원본 파일 삭제
+                uploadFile(token, convertedFile); // 파일 업로드
             }
 
             @Override
@@ -275,16 +278,15 @@ public class RecordActivity extends AppCompatActivity {
 
     }
 
-
     private void uploadFile(String token, File audioFile) {
         if (audioFile != null && audioFile.exists()) {
-            RequestBody requestFile = RequestBody.create(audioFile, MediaType.parse("audio/mp3"));
-            MultipartBody.Part body = MultipartBody.Part.createFormData("file", audioFile.getName(), requestFile);
+            RequestBody requestFile = RequestBody.create(audioFile, MediaType.parse("audio/mp3")); // 요청 본문 생성
+            MultipartBody.Part body = MultipartBody.Part.createFormData("file", audioFile.getName(), requestFile); // MultipartBody.Part 생성
 
-            ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-            RequestBody model = RequestBody.create("whisper-1", MediaType.parse("text/plain"));
+            ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class); // API 서비스 생성
+            RequestBody model = RequestBody.create("whisper-1", MediaType.parse("text/plain")); // 모델 이름 요청 본문 생성
 
-            Call<Void> call = apiService.saveAudio("Bearer " + token, body, model);
+            Call<Void> call = apiService.saveAudio("Bearer " + token, body, model); // API 호출
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
@@ -315,12 +317,11 @@ public class RecordActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    System.out.println(t);
+                    System.out.println(t); // 오류 출력
                 }
             });
 
         }
     }
-
 
 }
