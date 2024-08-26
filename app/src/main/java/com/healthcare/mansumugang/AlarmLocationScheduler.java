@@ -126,7 +126,7 @@ public class AlarmLocationScheduler {
                     List<ScheduleResponse.Schedule> schedules = response.body().getMedicineSchedules();
                     processSchedules(schedules, response.body(), currentLatitude, currentLongitude);
                 } else if (response.code() == 401) {
-                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                    Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Token may be expired. Refreshing token.");
                 } else {
                     // 오류 메시지 처리
                     String errorMessage = "API 호출 실패";
@@ -235,7 +235,7 @@ public class AlarmLocationScheduler {
                 if (response.isSuccessful()) {
                     System.out.println("complete");
                 } else if (response.code() == 401) {
-                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                    Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Token may be expired. Refreshing token.");
                 } else {
                     // 오류 메시지 처리
                     String errorMessage = "API 호출 실패";

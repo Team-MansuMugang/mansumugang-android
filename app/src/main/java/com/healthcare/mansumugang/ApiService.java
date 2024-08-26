@@ -94,6 +94,16 @@ public interface ApiService {
     Call<Void> saveAudio(@Header("Authorization") String accessToken, @Part MultipartBody.Part file, @Part("model") RequestBody model);
 
     /**
+     * record 가능 횟수의 정보를 서버로부터 요청합니다.
+     *
+     * @param accessToken 인증 토큰
+     * @return 서버로부터의 응답을 포함하는 Call 객체
+     */
+    @GET("api/record/check/saveLimit")
+    Call<ResponseBody> getSaveAudioLimit(@Header("Authorization") String accessToken);
+
+
+    /**
      * 이미지 파일을 서버로 저장 요청합니다.
      *
      * @param accessToken 인증 토큰

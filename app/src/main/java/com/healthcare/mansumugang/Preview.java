@@ -348,7 +348,7 @@ public class Preview extends Thread {
                                                 System.out.println("성공");
                                                 imageFile.delete();
                                             } else if (response.code() == 401) {
-                                                Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                                                Log.d(Constants.PREVIEW, "Token may be expired. Refreshing token.");
                                             } else {
                                                 String errorMessage = "API 호출 실패";
                                                 if (response.errorBody() != null) {

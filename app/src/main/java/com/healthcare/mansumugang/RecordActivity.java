@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,7 +22,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
@@ -95,6 +95,7 @@ public class RecordActivity extends AppCompatActivity {
         ImageButton recordImageButton = findViewById(R.id.recording_button); // 이미지 버튼 (녹음 시작)
         Button sendButton = findViewById(R.id.recording_save_button); // 녹음 저장 버튼
         Button cancelButton = findViewById(R.id.recording_cancel_button); // 녹음 취소 버튼
+        TextView limitCheckTextView = findViewById(R.id.save_limit); // 잔여 횟수 텍스트
 
         // 녹음 시작 버튼 클릭 리스너 설정
         recordButton.setOnClickListener(new View.OnClickListener() {
@@ -136,6 +137,57 @@ public class RecordActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // API를 호출하여 잔여 녹음 송신 횟수를 가져옴
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        String token = App.prefs.getToken(); // 저장된 토큰을 가져옴
+        Call<ResponseBody> call = apiService.getSaveAudioLimit("Bearer " + token);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // 성공적으로 응답을 받았을 때
+                    try {
+                        String responseBody = response.body().string();
+                        JsonParser parser = new JsonParser();
+                        JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
+
+                        // 서버에서 받아온 남은 송신 횟수 정보를 UI에 표시
+                        String message = "잔여 송신 횟수 : ";
+                        message += jsonObject.has("remainingRecordingCount") ? jsonObject.get("remainingRecordingCount").getAsString() : "No message";
+                        limitCheckTextView.setText(message);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (response.code() == 401) {
+                    // 토큰이 만료된 경우 로그
+                    Log.d(Constants.RECORD_ACTIVITY, "Token may be expired. Refreshing token.");
+                } else {
+                    // 오류 처리
+                    String errorMessage = "알 수 없는 오류";
+                    if (response.errorBody() != null) {
+                        try {
+                            // 오류 메시지를 가져와서 로그
+                            String errorBody = response.errorBody().string();
+                            JsonParser parser = new JsonParser();
+                            JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
+                            errorMessage = jsonObject.has("message") ? jsonObject.get("message").getAsString() : "서버 오류";
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    // 오류 메시지를 토스트로 표시
+                    Toast.makeText(RecordActivity.this, "오류 발생: " + errorMessage, Toast.LENGTH_LONG).show();
+                }
+            }
+
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
     }
 
     /**
@@ -297,7 +349,7 @@ public class RecordActivity extends AppCompatActivity {
                         }
 
                     } else if (response.code() == 401) {
-                        Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                        Log.d(Constants.RECORD_ACTIVITY, "Token may be expired. Refreshing token.");
                     } else {
                         String errorMessage = "API 호출 실패";
                         if (response.errorBody() != null) {

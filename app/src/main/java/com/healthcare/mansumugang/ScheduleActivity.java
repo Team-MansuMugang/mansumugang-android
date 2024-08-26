@@ -131,7 +131,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
                 if (response.isSuccessful()) {
                     displaySchedule(response.body()); // 성공적으로 데이터를 가져왔을 때 일정 표시
                 } else if (response.code() == 401) {
-                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                    Log.d(Constants.SCHEDULE_ACTIVITY, "Token may be expired. Refreshing token.");
                 } else {
                     // API 호출 실패 시 에러 메시지 처리
                     String errorMessage = "API 호출 실패";
@@ -179,7 +179,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
                     // 성공적으로 응답을 받았을 때 일정 데이터 다시 가져오기
                     fetchScheduleData(date);
                 } else if (response.code() == 401) {
-                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                    Log.d(Constants.SCHEDULE_ACTIVITY, "Token may be expired. Refreshing token.");
                 } else {
                     // 실패 처리
                     String errorMessage = "API 호출 실패";
@@ -229,7 +229,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
                     // 성공적으로 응답을 받았을 때 일정 데이터 다시 가져오기
                     fetchScheduleData(date);
                 } else if (response.code() == 401) {
-                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                    Log.d(Constants.SCHEDULE_ACTIVITY, "Token may be expired. Refreshing token.");
                 } else {
                     // 실패 처리
                     String errorMessage = "API 호출 실패";

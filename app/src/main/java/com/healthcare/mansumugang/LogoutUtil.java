@@ -76,7 +76,7 @@ public class LogoutUtil {
                     Toast.makeText(context, "로그아웃 성공", Toast.LENGTH_SHORT).show();
                 } else if (response.code() == 401) {
                     // 토큰이 만료된 경우, 로그에 메시지를 기록합니다.
-                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                    Log.d(Constants.LOGOUT, "Token may be expired. Refreshing token.");
                 } else {
                     // API 호출 실패 시, 오류 메시지를 분석하고 표시합니다.
                     String errorMessage = "API 호출 실패";

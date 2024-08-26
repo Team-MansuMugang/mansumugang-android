@@ -38,10 +38,10 @@ public class WebViewActivity extends AppCompatActivity {
         });
 
         // WebChromeClient를 설정하여 웹 페이지의 크롬 관련 이벤트를 처리합니다.
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebViewClient(new WebViewClient());
 
         // 웹뷰에서 로드할 URL을 지정하고 페이지를 로드합니다.
-        String url = "https://mansumugang.kr/sign-up/patient";
+        String url = "https://mansumugang.kr/sign-up/patient"; // base url 변경 시 상수등록
         webView.loadUrl(url);
     }
 }

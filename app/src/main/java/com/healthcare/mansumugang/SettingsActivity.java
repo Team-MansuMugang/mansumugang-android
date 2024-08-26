@@ -81,7 +81,7 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                 } else if (response.code() == 401) {
                     // 토큰이 만료된 경우 로그
-                    Log.d(Constants.LOCATION_HELPER_TAG, "Token may be expired. Refreshing token.");
+                    Log.d(Constants.SETTINGS_ACTIVITY, "Token may be expired. Refreshing token.");
                 } else {
                     // 오류 처리
                     String errorMessage = "알 수 없는 오류";

@@ -13,6 +13,10 @@ public class Constants {
     // AlarmScheduler에서 사용하는 로그 태그
     static final String ALARM_SCHEDULER_TAG = "AlarmScheduler";
 
+    static final String SETTINGS_ACTIVITY = "SETTINGSACTIVITY";
+
+    static final String RECORD_ACTIVITY = "RECORDACTIVITY";
+
     // AlarmLocationScheduler에서 사용하는 로그 태그
     static final String ALARM_LOCATION_SCHEDULER_TAG = "AlarmLocationScheduler";
 
@@ -24,6 +28,9 @@ public class Constants {
 
     // 로그인 화면의 식별자
     static final String LOGIN_ACTIVITY = "LoginActivity";
+
+    // 로그아웃 태그
+    static final String LOGOUT = "Logout";
 
     // 일정 화면의 식별자
     static final String SCHEDULE_ACTIVITY = "ScheduleActivity";
