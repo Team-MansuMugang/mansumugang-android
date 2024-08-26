@@ -10,7 +10,6 @@ import android.hardware.camera2.*;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -423,7 +422,7 @@ public class Preview extends Thread {
      *              바이트 배열을 사용하여 외부 저장소에 이미지를 저장합니다.
      */
     private void save(byte[] bytes) {
-        imageFile = new File(Environment.getExternalStorageDirectory() + "/DCIM/", new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".jpg");
+        imageFile = new File(mContext.getCacheDir().getAbsolutePath() + "/", new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".jpg");
         try (OutputStream output = new FileOutputStream(imageFile)) {
             output.write(bytes);
         } catch (IOException e) {
