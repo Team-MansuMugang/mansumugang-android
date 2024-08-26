@@ -245,7 +245,8 @@ public class Preview extends Thread {
 
                 @Override
                 public void onConfigureFailed(CameraCaptureSession session) {
-                    Toast.makeText(mContext, "Failed to configure camera", Toast.LENGTH_LONG).show();
+                    Log.d(Constants.PREVIEW, "Failed to configure camera");
+
                 }
             }, mBackgroundHandler);
         } catch (CameraAccessException e) {
@@ -329,7 +330,6 @@ public class Preview extends Thread {
                         session.capture(captureBuilder.build(), new CameraCaptureSession.CaptureCallback() {
                             @Override
                             public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
-                                Toast.makeText(mContext, "Picture taken!", Toast.LENGTH_SHORT).show();
                                 startPreview();
 
                                 if (imageFile != null && imageFile.exists()) {
@@ -344,6 +344,7 @@ public class Preview extends Thread {
                                         public void onResponse(Call<Void> call, Response<Void> response) {
                                             // 성공 응답 처리
                                             if (response.isSuccessful()) {
+                                                Toast.makeText(mContext, "사진이 전송되었습니다!", Toast.LENGTH_SHORT).show();
                                                 System.out.println("성공");
                                                 imageFile.delete();
                                             } else if (response.code() == 401) {
@@ -382,7 +383,7 @@ public class Preview extends Thread {
 
                 @Override
                 public void onConfigureFailed(CameraCaptureSession session) {
-                    Toast.makeText(mContext, "Failed to configure camera capture session", Toast.LENGTH_LONG).show();
+                    Log.d(Constants.PREVIEW, "Failed to configure camera capture session");
                 }
             }, captureHandler);
         } catch (CameraAccessException e) {
