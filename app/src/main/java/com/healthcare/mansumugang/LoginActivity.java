@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -40,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText loginIdEditText; // 로그인 아이디 입력 필드
     private EditText loginPasswordEditText; // 로그인 비밀번호 입력 필드
     private Button loginButton; // 로그인 버튼
+    private TextView joinButton; // 로그인 버튼
     private PermissionSupport permission; // 권한 요청을 지원하는 객체
 
     @Override
@@ -51,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         loginIdEditText = findViewById(R.id.login_id);
         loginPasswordEditText = findViewById(R.id.login_password);
         loginButton = findViewById(R.id.login_button);
+        joinButton = findViewById(R.id.join_button);
 
         // 권한 요청을 지원하는 객체 초기화
         permission = new PermissionSupport(this, this);
@@ -65,6 +68,21 @@ public class LoginActivity extends AppCompatActivity {
                 performLogin();
             }
         });
+        joinButton.setOnClickListener(v -> openSignUpPage());
+
+    }
+
+    /**
+     * 사용자가 가입 버튼을 클릭했을 때 호출되는 메소드입니다.
+     * 웹뷰를 사용하여 가입 페이지를 여는 액티비티를 시작합니다.
+     */
+    private void openSignUpPage() {
+        // WebViewActivity를 시작하기 위한 Intent를 생성합니다.
+        Intent intent = new Intent(this, WebViewActivity.class);
+
+        // WebViewActivity를 시작하고 결과를 받기 위해 startActivityForResult 호출합니다.
+        // Constants.SIGN_UP_REQUEST_CODE는 요청 코드로, 결과를 받을 때 사용됩니다.
+        startActivityForResult(intent, Constants.SIGN_UP_REQUEST_CODE);
     }
 
     /**

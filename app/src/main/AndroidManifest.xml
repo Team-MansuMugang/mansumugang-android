@@ -64,6 +64,10 @@
             android:name=".CameraActivity"
             android:theme="@style/NoAnimationTheme" />
 
+        <activity
+            android:name=".WebViewActivity"
+            android:theme="@style/NoAnimationTheme" />
+
 
         <service
             android:name=".LocationService"
