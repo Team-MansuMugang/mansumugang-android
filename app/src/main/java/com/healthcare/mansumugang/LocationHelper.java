@@ -48,8 +48,6 @@ public class LocationHelper {
     public void fetchLocationOnce() {
         // 위치 요청 객체를 생성하고 설정합니다.
         LocationRequest locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY) // 높은 정확도로 위치 요청
-                .setInterval(Constants.LOCATION_UPDATE_INTERVAL_MS) // 위치 업데이트 간격 (10초)
-                .setFastestInterval(Constants.LOCATION_UPDATE_FASTEST_INTERVAL_MS) // 위치 업데이트의 가장 빠른 간격 (5초)
                 .setNumUpdates(1); // 위치 업데이트를 한 번만 받도록 설정
 
         // 위치 권한이 있는지 확인합니다.
