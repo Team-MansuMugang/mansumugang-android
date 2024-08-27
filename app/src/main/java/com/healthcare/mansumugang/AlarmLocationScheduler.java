@@ -158,11 +158,6 @@ public class AlarmLocationScheduler {
         for (ScheduleResponse.Schedule schedule : schedules) {
             List<String> medicineNamesIn = new ArrayList<>();
 
-            if (isPastTime(scheduleResponse.getDate(), schedule.getTime())) {
-                Log.i(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Skipping past schedule: " + scheduleResponse.getDate() + " Day " + schedule.getTime());
-                continue;
-            }
-
             medicineNamesIn.add(scheduleResponse.getDate());
             medicineNamesIn.add(schedule.getTime());
 
@@ -182,7 +177,7 @@ public class AlarmLocationScheduler {
                 oneHourAfter.add(Calendar.HOUR_OF_DAY, 1);
 
                 // 현재 시간이 스케줄 시간의 1시간 전과 1시간 후 사이에 있는지 확인
-                if (currentTime.before(oneHourBefore) && !currentTime.after(oneHourAfter)) {
+                if (!currentTime.before(oneHourBefore) && !currentTime.after(oneHourAfter)) {
                     double latitude = schedule.getHospital().getLatitude();
                     double longitude = schedule.getHospital().getLongitude();
                     Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Hospital location - Lat: " + latitude + ", Lon: " + longitude);
@@ -191,6 +186,7 @@ public class AlarmLocationScheduler {
                     Location.distanceBetween(currentLatitude, currentLongitude, latitude, longitude, results);
                     float distanceInMeters = results[0];
 
+                    System.out.println(oneHourBefore.after(currentTime));
                     if (distanceInMeters <= 1000) {
                         Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "병원이 1km 내에 있습니다.");
                         if (!schedule.getHospital().isHospitalStatus()) {
@@ -203,10 +199,16 @@ public class AlarmLocationScheduler {
                         Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "병원이 1km 밖에 있습니다.");
                     }
                 } else {
+                    System.out.println(currentTime.after(oneHourAfter));
                     Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Current time is not within the 1-hour range of the scheduled time.");
                 }
 
                 medicineNamesIn.add(hospitalName);
+            }
+
+            if (isPastTime(scheduleResponse.getDate(), schedule.getTime())) {
+                Log.i(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Skipping past schedule: " + scheduleResponse.getDate() + " Day " + schedule.getTime());
+                continue;
             }
 
             for (ScheduleResponse.Schedule.Medicine medicine : schedule.getMedicines()) {
@@ -214,7 +216,10 @@ public class AlarmLocationScheduler {
             }
 
             medicineNames.add(medicineNamesIn);
+
+
         }
+
 
         // 기존 알람 취소 및 새 알람 설정
         AlarmScheduler.cancelAlarms(context, medicineNames);

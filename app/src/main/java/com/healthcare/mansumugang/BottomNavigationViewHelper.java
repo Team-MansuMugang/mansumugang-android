@@ -33,8 +33,6 @@ public class BottomNavigationViewHelper {
                     intent = new Intent(activity, RecordActivity.class);
                 } else if (id == R.id.schedule) {
                     intent = new Intent(activity, ScheduleActivity.class);
-                } else if (id == R.id.guideline) {
-                    intent = new Intent(activity, GuidelineActivity.class);
                 } else if (id == R.id.settings) {
                     intent = new Intent(activity, SettingsActivity.class);
                 } else if (id == R.id.camera) {

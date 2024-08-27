@@ -41,6 +41,7 @@
         <activity
             android:name=".ScheduleActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/NoAnimationTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -50,15 +51,15 @@
 
         <activity
             android:name=".RecordActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/NoAnimationTheme" />
         <activity
             android:name=".LoginActivity"
-            android:theme="@style/NoAnimationTheme" />
-        <activity
-            android:name=".GuidelineActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/NoAnimationTheme" />
         <activity
             android:name=".SettingsActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/NoAnimationTheme" />
         <activity
             android:name=".CameraActivity"
@@ -67,10 +68,12 @@
 
         <activity
             android:name=".LoginWebViewActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/NoAnimationTheme" />
 
         <activity
             android:name=".WithdrawWebViewActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/NoAnimationTheme" />
 
         <service

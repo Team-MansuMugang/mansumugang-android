@@ -1,6 +1,11 @@
 package com.healthcare.mansumugang;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -18,29 +23,56 @@ public class WithdrawWebViewActivity extends AppCompatActivity {
 
         // WebView를 초기화하고 JavaScript를 사용할 수 있도록 설정합니다.
         webView = findViewById(R.id.webview);
-        webView.getSettings().setJavaScriptEnabled(true);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setBuiltInZoomControls(true);
+        webView.requestFocusFromTouch();
 
-        // WebViewClient를 설정하여 페이지 로딩 및 URL 변경을 처리합니다.
+
+        // 웹뷰가 크로스 도메인 쿠키, 스토리지 등을 지원하도록 설정
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setAllowFileAccess(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+
+        String url = Constants.MAIN_URL + "/account/withdraw-patient";
+        System.out.println(url);
         webView.setWebViewClient(new WebViewClient() {
-
             @Override
             public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
                 super.doUpdateVisitedHistory(view, url, isReload);
-
-                // 방문 기록이 업데이트될 때 호출되며, URL이 변경되었는지 확인합니다.
-                // 현재 URL이 가입 완료 페이지와 다를 경우, 앱을 종료하고 결과를 반환합니다.
-                if (!url.startsWith("https://mansumugang.kr/account/withdraw-patient")) {
+                if (!url.startsWith(Constants.MAIN_URL + "/account/withdraw-patient")) {
                     setResult(RESULT_OK);
                     finish();
                 }
             }
         });
 
-        // WebViewClient 설정하여 웹 페이지의 웹 관련 이벤트를 처리합니다.
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
+                new AlertDialog.Builder(view.getContext()).setTitle("알림").setMessage(message).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        result.confirm();
+                    }
+                }).setCancelable(false).create().show();
+                return true;
+            }
 
-        // 웹뷰에서 로드할 URL을 지정하고 페이지를 로드합니다.
-        String url = "https://mansumugang.kr/account/withdraw-patient"; // base url 변경 시 상수등록
+            @Override
+            public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
+                new AlertDialog.Builder(view.getContext()).setTitle("알림").setMessage(message).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        result.confirm();
+                    }
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        result.cancel();
+                    }
+                }).setCancelable(false).create().show();
+                return true;
+            }
+        });
+
         webView.loadUrl(url);
     }
 }

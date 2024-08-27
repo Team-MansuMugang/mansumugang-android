@@ -47,8 +47,11 @@ public class Constants {
     // 위치 서비스 알림 채널 ID
     static final String LOCATION_SERVICE_CHANNEL = "LocationServiceChannel";
 
-    // 서버의 기본 URL
+    // 서버의 기본 API URL
     static final String BASE_URL = "https://api.mansumugang.kr";
+
+    // 서버의 기본 URL
+    static final String MAIN_URL = "https://mansumugang.kr";
 
     // 위치 서비스 시작 액션을 위한 상수
     static final String ACTION_START_LOCATION_SERVICE = "startLocationService";
