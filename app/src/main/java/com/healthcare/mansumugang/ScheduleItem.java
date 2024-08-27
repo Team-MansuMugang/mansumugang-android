@@ -43,6 +43,7 @@ public class ScheduleItem {
             // 스케줄 항목의 뷰를 생성합니다.
             View scheduleView = LayoutInflater.from(context).inflate(R.layout.schedule_item, layoutBox, false);
             TextView timeView = scheduleView.findViewById(R.id.timeText);
+
             timeView.setText(" " + scheduleTimeStr);
 
             // 레이아웃 박스에 생성된 스케줄 뷰를 추가합니다.
@@ -68,7 +69,9 @@ public class ScheduleItem {
                 }
             });
         }
-        if (schedule.getMedicines() == null) {
+        System.out.println(schedule.getMedicines().size());
+
+        if (schedule.getMedicines().isEmpty()) {
             return;
         }
 
@@ -76,6 +79,7 @@ public class ScheduleItem {
         // 스케줄 항목의 뷰를 생성합니다.
         View scheduleView = LayoutInflater.from(context).inflate(R.layout.schedule_item, layoutBox, false);
         TextView timeView = scheduleView.findViewById(R.id.timeText);
+
         timeView.setText(" " + scheduleTimeStr);
 
         // 레이아웃 박스에 생성된 스케줄 뷰를 추가합니다.
