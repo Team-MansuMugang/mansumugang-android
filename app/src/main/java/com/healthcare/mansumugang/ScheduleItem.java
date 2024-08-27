@@ -59,8 +59,8 @@ public class ScheduleItem {
             additionalBox.addView(hospitalView);
 
             // 현재 시간이 스케줄 시간 범위 내에 있는지 확인합니다.
-            boolean pastTime = inTimeRange(date, scheduleTimeStr);
-            setTakingHospitalButtonAttributes(pastTime, takingButton, schedule.getHospital().isHospitalStatus());
+            boolean inTime = inTimeRange(date, scheduleTimeStr);
+            setTakingHospitalButtonAttributes(inTime, takingButton, schedule.getHospital().isHospitalStatus());
 
             // TakingButton 클릭 리스너를 설정합니다.
             takingButton.setOnClickListener(v -> {
@@ -224,6 +224,7 @@ public class ScheduleItem {
         } else {
             takingButton.setText("약을 드셨어요!");
             takingButton.setBackgroundResource(R.drawable.schedule_button_green);
+            takingButton.setEnabled(false);
         }
     }
 
@@ -238,6 +239,8 @@ public class ScheduleItem {
         if (status) {
             takingButton.setText("병원을 방문하셨어요!");
             takingButton.setBackgroundResource(R.drawable.schedule_button_gray);
+            takingButton.setEnabled(false);
+
         } else if (inTimeRange) {
             takingButton.setText("병원에 방문하셨다면 여기를 눌러주세요");
             takingButton.setBackgroundResource(R.drawable.schedule_button_blue);
