@@ -81,7 +81,7 @@ public class Constants {
     static final long LOCATION_UPDATE_INTERVAL_MS = 10000;
 
     // 위치 업데이트의 가장 빠른 간격 (밀리초 단위), 5초
-    static final long LOCATION_UPDATE_FASTEST_INTERVAL_MS = 5000;
+    static final long LOCATION_UPDATE_FASTEST_INTERVAL_MS = 5000;  // 즉 5~10초 간격임
 
     // 백그라운드 위치 권한 요청 코드
     static final int BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 1024;

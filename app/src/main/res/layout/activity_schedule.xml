@@ -29,7 +29,7 @@
             android:padding="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/weekRecyclerView"></LinearLayout>
+            app:layout_constraintTop_toBottomOf="@id/weekRecyclerView"/>
     </ScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

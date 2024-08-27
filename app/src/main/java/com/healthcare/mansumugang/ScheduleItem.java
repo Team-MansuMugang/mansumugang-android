@@ -35,24 +35,24 @@ public class ScheduleItem {
      * @param date              일정 날짜
      * @return 생성된 스케줄 뷰
      */
-    public static View createScheduleView(Context context, LinearLayout layoutBox, ScheduleResponse.Schedule schedule, String imageApiUrlPrefix, String date) {
+    public static void createScheduleView(Context context, LinearLayout layoutBox, ScheduleResponse.Schedule schedule, String imageApiUrlPrefix, String date) {
         String scheduleTimeStr = schedule.getTime(); // 일정 시간 문자열
 
-        // 스케줄 항목의 뷰를 생성합니다.
-        View scheduleView = LayoutInflater.from(context).inflate(R.layout.schedule_item, layoutBox, false);
-        TextView timeView = scheduleView.findViewById(R.id.timeText);
-        timeView.setText(" " + scheduleTimeStr);
-
-        // 레이아웃 박스에 생성된 스케줄 뷰를 추가합니다.
-        layoutBox.addView(scheduleView);
-
-        // 추가 정보 박스를 찾습니다.
-        LinearLayout additionalBox = scheduleView.findViewById(R.id.additionalBox);
-        TextView takingButton = scheduleView.findViewById(R.id.TakingButtonAct);
-
-        List<Long> medicineIds = new ArrayList<>();
-
         if (schedule.getHospital() != null) {
+
+            // 스케줄 항목의 뷰를 생성합니다.
+            View scheduleView = LayoutInflater.from(context).inflate(R.layout.schedule_item, layoutBox, false);
+            TextView timeView = scheduleView.findViewById(R.id.timeText);
+            timeView.setText(" " + scheduleTimeStr);
+
+            // 레이아웃 박스에 생성된 스케줄 뷰를 추가합니다.
+            layoutBox.addView(scheduleView);
+
+            // 추가 정보 박스를 찾습니다.
+            LinearLayout additionalBox = scheduleView.findViewById(R.id.additionalBox);
+            TextView takingButton = scheduleView.findViewById(R.id.TakingButtonAct);
+
+
             // 병원 정보가 있는 경우, 병원 뷰를 생성하여 추가합니다.
             View hospitalView = createHospitalView(context, schedule.getHospital());
             additionalBox.addView(hospitalView);
@@ -68,6 +68,21 @@ public class ScheduleItem {
                 }
             });
         }
+
+        // 스케줄 항목의 뷰를 생성합니다.
+        View scheduleView = LayoutInflater.from(context).inflate(R.layout.schedule_item, layoutBox, false);
+        TextView timeView = scheduleView.findViewById(R.id.timeText);
+        timeView.setText(" " + scheduleTimeStr);
+
+        // 레이아웃 박스에 생성된 스케줄 뷰를 추가합니다.
+        layoutBox.addView(scheduleView);
+
+        // 추가 정보 박스를 찾습니다.
+        LinearLayout additionalBox = scheduleView.findViewById(R.id.additionalBox);
+        TextView takingButton = scheduleView.findViewById(R.id.TakingButtonAct);
+
+
+        List<Long> medicineIds = new ArrayList<>();
 
         // 약물 아이템을 추가합니다.
         for (ScheduleResponse.Schedule.Medicine medicine : schedule.getMedicines()) {
@@ -91,7 +106,6 @@ public class ScheduleItem {
             });
         }
 
-        return scheduleView;
     }
 
     /**
