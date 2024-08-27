@@ -39,9 +39,12 @@ public class SettingsActivity extends AppCompatActivity {
         // 알람 위치 스케줄러 초기화
         alarmLocationScheduler = new AlarmLocationScheduler(this);
 
-        // 로그아웃 버튼과 컨테이너를 찾습니다.
+
+        // 로그아웃 버튼 회원탈퇴 ,과 컨테이너를 찾습니다.
         TextView logoutButton = findViewById(R.id.logout_button);
         membersContainer = findViewById(R.id.members_container); // 레이아웃에서 가족 구성원 컨테이너 ID
+        TextView withdrawButton = findViewById(R.id.withdraw);
+
 
         // 하단 네비게이션 뷰 설정
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -59,6 +62,16 @@ public class SettingsActivity extends AppCompatActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // 새로운 태스크로 시작하고 현재 태스크를 지웁니다.
             startActivity(intent);
             finish(); // 현재 액티비티 종료
+        });
+
+        withdrawButton.setOnClickListener(view -> {
+            LogoutUtil.performLogout(this, alarmLocationScheduler);
+            // 로그인 화면으로 이동
+            Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // 새로운 태스크로 시작하고 현재 태스크를 지웁니다.
+            startActivity(intent);
+            finish(); // 현재 액티비티 종료
+            openWithdrawPage();
         });
 
         // API를 호출하여 가족 구성원 정보 가져오기
@@ -108,6 +121,23 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
     }
+
+    /**
+     * 사용자가 탈퇴 버튼을 클릭했을 때 호출되는 메소드입니다.
+     * 웹뷰를 사용하여 탈퇴 페이지를 여는 액티비티를 시작합니다.
+     */
+    private void openWithdrawPage() {
+        // WebViewActivity를 시작하기 위한 Intent를 생성합니다.
+        Intent intent = new Intent(this, WithdrawWebViewActivity.class);
+
+
+        // WebViewActivity를 시작하고 결과를 받기 위해 startActivityForResult 호출합니다.
+        // Constants.SIGN_UP_REQUEST_CODE는 요청 코드로, 결과를 받을 때 사용됩니다.
+        startActivityForResult(intent, Constants.WITHDRAW_REQUEST_CODE);
+
+
+    }
+
 
     /**
      * FamilyMember 정보를 뷰에 추가합니다.

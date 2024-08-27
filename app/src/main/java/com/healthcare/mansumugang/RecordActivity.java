@@ -95,7 +95,6 @@ public class RecordActivity extends AppCompatActivity {
         ImageButton recordImageButton = findViewById(R.id.recording_button); // 이미지 버튼 (녹음 시작)
         Button sendButton = findViewById(R.id.recording_save_button); // 녹음 저장 버튼
         Button cancelButton = findViewById(R.id.recording_cancel_button); // 녹음 취소 버튼
-        TextView limitCheckTextView = findViewById(R.id.save_limit); // 잔여 횟수 텍스트
 
         // 녹음 시작 버튼 클릭 리스너 설정
         recordButton.setOnClickListener(new View.OnClickListener() {
@@ -138,7 +137,14 @@ public class RecordActivity extends AppCompatActivity {
             }
         });
 
+        updateLimit();
+
+    }
+
+    private void updateLimit(){
         // API를 호출하여 잔여 녹음 송신 횟수를 가져옴
+        TextView limitCheckTextView = findViewById(R.id.save_limit); // 잔여 횟수 텍스트
+
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         String token = App.prefs.getToken(); // 저장된 토큰을 가져옴
         Call<ResponseBody> call = apiService.getSaveAudioLimit("Bearer " + token);
@@ -187,7 +193,6 @@ public class RecordActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     /**
@@ -346,6 +351,7 @@ public class RecordActivity extends AppCompatActivity {
                         // 파일 삭제
                         if (audioFile.exists()) {
                             audioFile.delete();
+                            updateLimit();
                         }
 
                     } else if (response.code() == 401) {

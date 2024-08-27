@@ -1,14 +1,13 @@
 package com.healthcare.mansumugang;
 
 import android.os.Bundle;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class WebViewActivity extends AppCompatActivity {
+public class WithdrawWebViewActivity extends AppCompatActivity {
 
     private WebView webView;
 
@@ -30,18 +29,18 @@ public class WebViewActivity extends AppCompatActivity {
 
                 // 방문 기록이 업데이트될 때 호출되며, URL이 변경되었는지 확인합니다.
                 // 현재 URL이 가입 완료 페이지와 다를 경우, 앱을 종료하고 결과를 반환합니다.
-                if (!url.startsWith("https://mansumugang.kr/sign-up/patient")) {
+                if (!url.startsWith("https://mansumugang.kr/account/withdraw-patient")) {
                     setResult(RESULT_OK);
                     finish();
                 }
             }
         });
 
-        // WebChromeClient를 설정하여 웹 페이지의 크롬 관련 이벤트를 처리합니다.
+        // WebViewClient 설정하여 웹 페이지의 웹 관련 이벤트를 처리합니다.
         webView.setWebViewClient(new WebViewClient());
 
         // 웹뷰에서 로드할 URL을 지정하고 페이지를 로드합니다.
-        String url = "https://mansumugang.kr/sign-up/patient"; // base url 변경 시 상수등록
+        String url = "https://mansumugang.kr/account/withdraw-patient"; // base url 변경 시 상수등록
         webView.loadUrl(url);
     }
 }

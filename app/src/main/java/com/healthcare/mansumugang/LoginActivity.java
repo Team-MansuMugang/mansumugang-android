@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void openSignUpPage() {
         // WebViewActivity를 시작하기 위한 Intent를 생성합니다.
-        Intent intent = new Intent(this, WebViewActivity.class);
+        Intent intent = new Intent(this, LoginWebViewActivity.class);
 
         // WebViewActivity를 시작하고 결과를 받기 위해 startActivityForResult 호출합니다.
         // Constants.SIGN_UP_REQUEST_CODE는 요청 코드로, 결과를 받을 때 사용됩니다.

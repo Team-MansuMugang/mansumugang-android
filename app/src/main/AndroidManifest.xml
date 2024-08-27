@@ -66,9 +66,12 @@
             android:theme="@style/NoAnimationTheme" />
 
         <activity
-            android:name=".WebViewActivity"
+            android:name=".LoginWebViewActivity"
             android:theme="@style/NoAnimationTheme" />
 
+        <activity
+            android:name=".WithdrawWebViewActivity"
+            android:theme="@style/NoAnimationTheme" />
 
         <service
             android:name=".LocationService"

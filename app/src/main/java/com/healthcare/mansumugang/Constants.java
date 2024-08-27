@@ -92,6 +92,10 @@ public class Constants {
     // 웹뷰 요청 코드
     static final int SIGN_UP_REQUEST_CODE = 101;
 
+    // 웹뷰 요청 코드
+    static final int WITHDRAW_REQUEST_CODE = 102;
+
+
     // 오디오 녹음과 저장에 필요한 권한 목록
     static final String[] RECORD_PERMISSIONS = {android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
 
