@@ -177,7 +177,7 @@ public class AlarmLocationScheduler {
                 oneHourAfter.add(Calendar.HOUR_OF_DAY, 1);
 
                 // 현재 시간이 스케줄 시간의 1시간 전과 1시간 후 사이에 있는지 확인
-                if (!currentTime.before(oneHourBefore) && !currentTime.after(oneHourAfter)) {
+                if (currentTime.after(oneHourBefore)  && oneHourAfter.after(currentTime)) {
                     double latitude = schedule.getHospital().getLatitude();
                     double longitude = schedule.getHospital().getLongitude();
                     Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "Hospital location - Lat: " + latitude + ", Lon: " + longitude);
@@ -186,7 +186,6 @@ public class AlarmLocationScheduler {
                     Location.distanceBetween(currentLatitude, currentLongitude, latitude, longitude, results);
                     float distanceInMeters = results[0];
 
-                    System.out.println(oneHourBefore.after(currentTime));
                     if (distanceInMeters <= 1000) {
                         Log.d(Constants.ALARM_LOCATION_SCHEDULER_TAG, "병원이 1km 내에 있습니다.");
                         if (!schedule.getHospital().isHospitalStatus()) {
