@@ -68,6 +68,10 @@ public class ScheduleItem {
                 }
             });
         }
+        if (schedule.getMedicines() == null) {
+            return;
+        }
+
 
         // 스케줄 항목의 뷰를 생성합니다.
         View scheduleView = LayoutInflater.from(context).inflate(R.layout.schedule_item, layoutBox, false);
