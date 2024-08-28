@@ -3,6 +3,31 @@
 #만수무강 안드로이드 App
 **고령의 환자와 보호자 모두가 안심할 수 있는** 공간을 만들기 위한 안심케어 및 커뮤니티 서비스 **만수무강 안드로이드앱입니다.**
 
+## 기기 요구사항
+이 프로젝트를 실행하기 위해서는 아래의 환경이 필요합니다:
+
+### 지원 API
+```
+Taget Api : 24(Android 7) ~ 34(Android 14)
+```
+
+## 📥 Installation
+
+### 프로젝트 Clone
+```
+git clone https://github.com/Team-MansuMugang/mansumugang-android.git
+```
+
+### 2. 프로젝트 이동
+```
+cd mansumugang-android
+```
+
+### 3. IDE로 실행
+```
+use Android-IDE (Android Studio ...)
+```
+
 ## 🌟 Features
 
 - **약 일정 기록 및 알림**: 설정된 약 복용 스케줄에 따라 알림을 지원하여 케어 맴버가 약을 놓치지 않고 복용할 수 있도록 지원하며 복약 기록을 통해 보호자에게 기록을 제공합니다.
