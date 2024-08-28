@@ -23,7 +23,7 @@ git clone https://github.com/Team-MansuMugang/mansumugang-android.git
 cd mansumugang-android
 ```
 
-### 3. IDE로 실행
+### 3. IDE 실행
 ```
 open with Android-IDE (Android Studio ...)
 ```
