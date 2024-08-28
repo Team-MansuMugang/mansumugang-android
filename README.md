@@ -25,9 +25,22 @@ cd mansumugang-android
 
 ### 3. IDE로 실행
 ```
-use Android-IDE (Android Studio ...)
+open with Android-IDE (Android Studio ...)
 ```
 
+### 4. Gradle Sync
+```
+It updates automatically, but if it doesn't click File > Sync Project with Gradle Files
+```
+
+### 5.빌드 및 실행 (Build & Run)
+```
+안드로이드 에뮬레이터를 설정하거나, USB 디버깅이 활성화된 실제 안드로이드 기기를 연결합니다.
+1.	에뮬레이터나 연결된 실제 기기를 선택합니다.
+2.	Android Studio 상단의 “Run” 버튼을 클릭하거나, Shift + F10을 눌러 애플리케이션을 실행합니다.
+
+
+```
 ## 🌟 Features
 
 - **약 일정 기록 및 알림**: 설정된 약 복용 스케줄에 따라 알림을 지원하여 케어 맴버가 약을 놓치지 않고 복용할 수 있도록 지원하며 복약 기록을 통해 보호자에게 기록을 제공합니다.
