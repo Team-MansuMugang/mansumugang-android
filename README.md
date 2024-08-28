@@ -45,7 +45,7 @@ use Android-IDE (Android Studio ...)
 
 ## 🎥 Demo
 
-Insert gif or link to demo
+youtube demo
 
 [![Video Label](http://img.youtube.com/vi/6WP0Y-pIVe8/0.jpg)](https://youtu.be/6WP0Y-pIVe8?si=HEJ8IRgIGGOGIK5Q)
 
