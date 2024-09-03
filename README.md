@@ -54,7 +54,7 @@ Android Studio IDE를 실행합니다.
 
 youtube demo
 
-[![Video Label](https://www.youtube.com/watch?v=HibTS8bE_0U)]
+[![Video Label](https://img.youtube.com/vi/HibTS8bE_0U/0.jpg)](https://www.youtube.com/watch?v=HibTS8bE_0U)
 
 ## 🧑‍💻 Authors
 
