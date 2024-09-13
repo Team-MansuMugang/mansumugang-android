@@ -51,9 +51,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v${{ env.VERSION }}
-        release_name: Release v${{ env.VERSION }}
+        release_name: 만수무강 v${{ env.VERSION }}
         body: |
           만수무강의 ${{ env.VERSION }} 버전이 릴리즈 되었습니다.
+          ### 고령의 환자와 보호자 모두가 안심할 수 있는 공간을 만들기 위한 안심케어 및 커뮤니티 서비스 만수무강 안드로이드 앱 입니다.
         draft: false
         prerelease: false
 
