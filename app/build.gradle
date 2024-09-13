@@ -28,12 +28,7 @@ android {
     }
 }
 
-// Add a custom task to print the versionName
-task printVersion {
-    doLast {
-        println android.defaultConfig.versionName
-    }
-}
+
 
 dependencies {
     implementation 'com.arthenica:mobile-ffmpeg-full:4.4'
