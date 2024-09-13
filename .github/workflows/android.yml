@@ -23,10 +23,6 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Debug info
-      run: |
-        echo "GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}"
-        echo "Upload URL: ${{ steps.create_release.outputs.upload_url }}"
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
@@ -64,6 +60,8 @@ jobs:
 
     - name: Upload APK to Release
       uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./app/build/outputs/apk/release/app-release-unsigned.apk
