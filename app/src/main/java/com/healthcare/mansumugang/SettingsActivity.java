@@ -1,16 +1,21 @@
 package com.healthcare.mansumugang;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -18,7 +23,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.xmlpull.v1.XmlPullParser;
+
 import java.io.IOException;
+import java.io.StringWriter;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,6 +52,14 @@ public class SettingsActivity extends AppCompatActivity {
         TextView logoutButton = findViewById(R.id.logout_button);
         membersContainer = findViewById(R.id.members_container); // 레이아웃에서 가족 구성원 컨테이너 ID
         TextView withdrawButton = findViewById(R.id.withdraw);
+
+        TextView showTermsButton = findViewById(R.id.showTermsButton);
+        showTermsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTermsOfServiceDialog();
+            }
+        });
 
 
         // 하단 네비게이션 뷰 설정
@@ -250,4 +266,21 @@ public class SettingsActivity extends AppCompatActivity {
     private int dpToPx(int dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
+
+    private void showTermsOfServiceDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.terms_of_use, null);
+        builder.setView(dialogView);
+        builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
+    }
+
+
+
 }

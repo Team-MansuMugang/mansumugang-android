@@ -91,6 +91,15 @@
             app:layout_constraintEnd_toEndOf="@+id/login_password"
             app:layout_constraintStart_toStartOf="@+id/login_password" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/showTermsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="이용약관 보기"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginTop="20dp"
+        android:padding="10dp" />
 </LinearLayout>

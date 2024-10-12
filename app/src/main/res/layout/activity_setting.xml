@@ -61,6 +61,16 @@
         app:layout_constraintBottom_toTopOf="@id/withdraw" />
 
     <TextView
+        android:id="@+id/showTermsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@id/withdraw"
+        android:text="이용약관 보기" />
+
+    <TextView
         android:id="@+id/withdraw"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

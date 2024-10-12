@@ -9,10 +9,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +26,8 @@ import androidx.core.content.ContextCompat;
 
 import com.google.gson.JsonObject;
 
+import org.xmlpull.v1.XmlPullParser;
+
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -30,6 +35,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.io.StringWriter;
 
 /**
  * LoginActivity 클래스는 사용자가 로그인할 수 있는 화면을 제공합니다.
@@ -60,6 +66,15 @@ public class LoginActivity extends AppCompatActivity {
 
         // 권한 확인 및 요청
         permissionCheck();
+
+        TextView showTermsButton = findViewById(R.id.showTermsButton);
+        showTermsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTermsOfServiceDialog();
+            }
+        });
+
 
         // 로그인 버튼 클릭 시 로그인 작업 수행
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -257,4 +272,23 @@ public class LoginActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         Log.e(Constants.LOGIN_ACTIVITY, message);
     }
+
+    // XML 파일을 파싱하여 텍스트로 변환
+    private void showTermsOfServiceDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.terms_of_use, null);
+        builder.setView(dialogView);
+        builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
+    }
+
+
+
+
 }
