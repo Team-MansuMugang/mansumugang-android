@@ -30,7 +30,7 @@ public class CameraActivity extends AppCompatActivity {
 
         // BottomNavigationView 설정
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.camera); // 현재 화면을 카메라로 설정
+        bottomNavigationView.setSelectedItemId(R.id.camera_bottom_nav); // 현재 화면을 카메라로 설정
 
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);
 

@@ -57,7 +57,7 @@ public class ScheduleActivity extends AppCompatActivity implements OnDateSelecte
 
         // BottomNavigationView 설정
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.schedule);
+        bottomNavigationView.setSelectedItemId(R.id.schedule_bottom_nav);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);
 
         // 일정 항목을 추가할 레이아웃 박스 초기화

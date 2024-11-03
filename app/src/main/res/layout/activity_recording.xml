@@ -54,7 +54,7 @@
             android:layout_marginBottom="30dp"
             android:gravity="center_horizontal"
             android:layerType="hardware"
-            android:textSize="25dp"
+            android:textSize="25sp"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="@id/recording_button" />
 
@@ -76,7 +76,7 @@
             android:layout_marginBottom="50dp"
             android:backgroundTint="@color/SecondaryColorDark"
             android:text="시작"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:visibility="visible" />
 
         <LinearLayout
@@ -93,7 +93,7 @@
                 android:layout_marginRight="30dp"
                 android:backgroundTint="@color/SecondaryColorDark"
                 android:text="전송"
-                android:textSize="20dp" />
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/recording_cancel_button"
@@ -101,7 +101,7 @@
                 android:layout_height="70dp"
                 android:backgroundTint="@color/Gray75"
                 android:text="취소"
-                android:textSize="20dp">
+                android:textSize="20sp">
 
             </Button>
 

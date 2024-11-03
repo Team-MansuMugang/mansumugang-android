@@ -57,6 +57,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="16dp"
             android:background="@drawable/red_circle_button"
+            android:contentDescription="촬영버튼"
             android:text="" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView

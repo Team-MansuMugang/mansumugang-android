@@ -64,7 +64,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         // 하단 네비게이션 뷰 설정
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.settings); // 기본 선택 항목 설정
+        bottomNavigationView.setSelectedItemId(R.id.settings_bottom_nav); // 기본 선택 항목 설정
 
         // 하단 네비게이션 뷰 설정 헬퍼 메소드 호출
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);

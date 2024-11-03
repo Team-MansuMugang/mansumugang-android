@@ -29,13 +29,13 @@ public class BottomNavigationViewHelper {
                 int id = item.getItemId();
 
                 // 선택된 메뉴 아이템의 ID에 따라 적절한 Activity를 설정합니다.
-                if (id == R.id.recording) {
+                if (id == R.id.recording_bottom_nav) {
                     intent = new Intent(activity, RecordActivity.class);
-                } else if (id == R.id.schedule) {
+                } else if (id == R.id.schedule_bottom_nav) {
                     intent = new Intent(activity, ScheduleActivity.class);
-                } else if (id == R.id.settings) {
+                } else if (id == R.id.settings_bottom_nav) {
                     intent = new Intent(activity, SettingsActivity.class);
-                } else if (id == R.id.camera) {
+                } else if (id == R.id.camera_bottom_nav) {
                     intent = new Intent(activity, CameraActivity.class);
                 }
 

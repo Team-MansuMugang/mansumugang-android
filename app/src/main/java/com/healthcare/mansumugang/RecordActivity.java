@@ -47,7 +47,7 @@ public class RecordActivity extends AppCompatActivity {
 
         // BottomNavigationView 설정
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.recording);
+        bottomNavigationView.setSelectedItemId(R.id.recording_bottom_nav);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationView, this);
 
         // 오디오 권한 체크 및 요청
